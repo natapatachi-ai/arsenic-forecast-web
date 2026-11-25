@@ -1,0 +1,55 @@
+# ระบบอัปเดตอัตโนมัติ: ตรวจเว็บ คพ. (สคพ.1 กก–สาย–รวก–โขง และสาละวิน, สคพ.9 โขงอีสาน) ทุก 6 ชั่วโมง ถ้ามีรายงานใหม่จะถอดตาราง ตรวจ QC พยากรณ์ใหม่ และเผยแพร่หน้าเว็บ
+name: update-forecast
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"     # ทุก 6 ชั่วโมง (เวลา UTC) นาทีที่ 17
+  workflow_dispatch: {}         # กดรันเองได้จากแท็บ Actions
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: update-forecast
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r forecast/requirements.txt pdfplumber
+
+      # 1) เฝ้าแหล่งข้อมูล: exit 2 = QC ไม่ผ่าน (ไม่เขียนทับข้อมูล แต่ job แจ้งเตือน)
+      - name: Watch PCD reports
+        run: python forecast/scripts/05_watch_pcd.py
+
+      # 1b) เครือข่ายสาละวิน (สคพ.1) และแม่น้ำโขงภาคอีสาน (สคพ.9) — ถ้า QC ไม่ผ่านจะไม่เขียนทับ แต่ให้งานส่วนอื่นเดินต่อ
+      - name: Watch Salween and Northeast Mekong reports
+        continue-on-error: true
+        run: python forecast/scripts/05b_watch_networks.py
+
+      # 2) คำนวณใหม่เฉพาะเมื่อข้อมูลดิบเปลี่ยน (run_all.py เทียบ hash เอง)
+      - name: Rebuild, QC gate, forecast
+        run: python forecast/scripts/run_all.py
+
+      - name: Export site data
+        run: python forecast/scripts/06_export_site.py
+
+      - name: Commit changes
+        run: |
+          git config user.name "forecast-bot"
+          git config user.email "forecast-bot@users.noreply.github.com"
+          git add forecast/data web
+          git diff --cached --quiet || git commit -m "auto: update data and forecast $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - uses: actions/deploy-pages@v4

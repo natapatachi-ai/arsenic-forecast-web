@@ -1,0 +1,37 @@
+{
+  "n_point_tests": 236,
+  "rmse_ln_model": 0.5632206744129981,
+  "rmse_ln_persistence": 0.6812097815982394,
+  "coverage80_raw": 0.7415254237288136,
+  "interval_calibration_k": 1.1355800728055625,
+  "coverage80_after_k_in_sample": 0.8008474576271186,
+  "n_exceed_tests": 512,
+  "brier_model": 0.17427769685479821,
+  "brier_climatology": 0.24847412109375,
+  "by_network": {
+    "kok_basin": {
+      "n_point_tests": 187,
+      "rmse_ln_model": 0.5114404288409863,
+      "rmse_ln_persistence": 0.6705064565510807,
+      "n_exceed_tests": 433,
+      "brier_model": 0.19154715151364451,
+      "hit_rate_p50": 0.7043879907621247
+    },
+    "mekong_ne": {
+      "n_point_tests": 3,
+      "rmse_ln_model": 2.2828399655240914,
+      "rmse_ln_persistence": 2.2833450775381148,
+      "n_exceed_tests": 12,
+      "brier_model": 0.2498410507640428,
+      "hit_rate_p50": 0.75
+    },
+    "salween": {
+      "n_point_tests": 46,
+      "rmse_ln_model": 0.4735487283233857,
+      "rmse_ln_persistence": 0.46163195455752487,
+      "n_exceed_tests": 67,
+      "brier_model": 0.04913688918030026,
+      "hit_rate_p50": 0.9402985074626866
+    }
+  }
+}

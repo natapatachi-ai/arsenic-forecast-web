@@ -1,0 +1,13 @@
+round,station_id,value_reported,value_low,value_high,scope,source_url,note
+11,KO01,14,14,14,station,https://www.thansettakij.com/sustainable/environment/662104,
+11,SA01,26,26,26,station,https://www.thansettakij.com/sustainable/environment/662104,โครเมียม 46 มก./กก. ด้วย
+11,SA03,14,14,14,station,https://www.thansettakij.com/sustainable/environment/662104,โครเมียม 58 มก./กก. ด้วย
+12,KK01,23,23,23,station,https://www.naewna.com/n/?p=18164,
+12,KK05,11,11,11,station,https://www.naewna.com/n/?p=18164,
+12,KK07,15,15,15,station,https://www.naewna.com/n/?p=18164,
+12,KK11,16,16,16,station,https://www.naewna.com/n/?p=18164,
+12,KK12,16,16,16,station,https://www.naewna.com/n/?p=18164,
+12,SA01,25,25,25,station,https://www.naewna.com/n/?p=18164,
+12,NK01,66,66,66,station,https://www.naewna.com/n/?p=18164,
+12,NK03,50,50,50,station,https://www.naewna.com/n/?p=18164,
+12,NK04,68,68,68,station,https://www.naewna.com/n/?p=18164,

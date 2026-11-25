@@ -1,0 +1,107 @@
+round,station_id,value_reported,value_low,value_high,scope,source_url,note
+11,KK09,0.011,0.011,0.011,station,https://www.thaipbs.or.th/news/content/357226,
+11,KK13,0.011,0.011,0.011,station,https://www.thaipbs.or.th/news/content/357226,ข่าวเขียน KK013 ตีความเป็น KK13
+11,NK01,0.014,0.014,0.014,station,https://www.thaipbs.or.th/news/content/357226,
+11,NK02,0.013,0.013,0.013,station,https://www.thaipbs.or.th/news/content/357226,
+11,NK03,น้อยกว่า 0.011,0.010,0.011,ambiguous,https://www.thaipbs.or.th/news/content/357226,ข่าวจัดเป็นเกินมาตรฐานแต่เขียนว่าน้อยกว่า 0.011
+11,SA01,0.024,0.024,0.024,station,https://www.thaipbs.or.th/news/content/357226,
+11,SA02,0.026,0.026,0.026,station,https://www.thaipbs.or.th/news/content/357226,
+11,SA03,0.022,0.022,0.022,station,https://www.thaipbs.or.th/news/content/357226,
+11,FA01,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thaipbs.or.th/news/content/357226,
+11,SU01,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thaipbs.or.th/news/content/357226,
+11,LA01,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thaipbs.or.th/news/content/357226,
+15,KK01,0.011-0.012,0.011,0.012,interval,https://www.thansettakij.com/general-news/651582,ช่วงค่ารวมสะพานท่าตอนถึงสะพานแม่นาวาง-ท่าตอน
+15,KK02,0.011-0.012,0.011,0.012,interval,https://www.thansettakij.com/general-news/651582,ช่วงค่ารวมสะพานท่าตอนถึงสะพานแม่นาวาง-ท่าตอน
+15,SA01,0.011-0.014,0.011,0.014,interval,https://www.thansettakij.com/general-news/651582,ทุกจุดของแม่น้ำสาย
+15,SA02,0.011-0.014,0.011,0.014,interval,https://www.thansettakij.com/general-news/651582,ทุกจุดของแม่น้ำสาย
+15,SA03,0.011-0.014,0.011,0.014,interval,https://www.thansettakij.com/general-news/651582,ทุกจุดของแม่น้ำสาย
+15,FA01,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thansettakij.com/general-news/651582,
+15,KO01,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thansettakij.com/general-news/651582,ข่าวเขียนแม่น้ำกรณ์
+15,LA01,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thansettakij.com/general-news/651582,
+15,RU01,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thansettakij.com/general-news/651582,
+15,RU02,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thansettakij.com/general-news/651582,
+15,NK01,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thansettakij.com/general-news/651582,
+15,NK02,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thansettakij.com/general-news/651582,
+15,NK03,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thansettakij.com/general-news/651582,
+16,SA01,0.011-0.015,0.011,0.015,interval,https://www.thansettakij.com/sustainable/environment/654816,ทุกจุดของแม่น้ำสาย
+16,SA02,0.011-0.015,0.011,0.015,interval,https://www.thansettakij.com/sustainable/environment/654816,ทุกจุดของแม่น้ำสาย
+16,SA03,0.011-0.015,0.011,0.015,interval,https://www.thansettakij.com/sustainable/environment/654816,ทุกจุดของแม่น้ำสาย
+16,NK01,0.014-0.015,0.014,0.015,interval,https://www.thansettakij.com/sustainable/environment/654816,จุดผ่านแดนสามเหลี่ยมทองคำ
+16,RU01,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thansettakij.com/sustainable/environment/654816,
+16,RU02,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thansettakij.com/sustainable/environment/654816,
+17,KK01,0.011,0.011,0.011,station,https://www.thansettakij.com/sustainable/environment/655339,
+17,KK05,0.011,0.011,0.011,station,https://www.thansettakij.com/sustainable/environment/655339,
+17,SA02,0.011-0.024,0.011,0.024,interval,https://www.thansettakij.com/sustainable/environment/655339,ช่วงค่ารวม SA02-SA03
+17,SA03,0.011-0.024,0.011,0.024,interval,https://www.thansettakij.com/sustainable/environment/655339,ช่วงค่ารวม SA02-SA03
+17,RU01,0.013,0.013,0.013,station,https://www.thansettakij.com/sustainable/environment/655339,สถานีสูบน้ำเกาะช้าง
+17,RU02,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thansettakij.com/sustainable/environment/655339,ข่าวระบุจุดอื่นของแม่น้ำรวกเป็นไปตามมาตรฐาน
+17,NK01,เกินมาตรฐาน (ไม่ระบุค่า),0.010,,ambiguous,https://www.thansettakij.com/sustainable/environment/655339,รู้เพียงว่าเกิน 0.010
+18,KK01,0.011,0.011,0.011,station,https://www.thaipbs.or.th/news/content/506386,
+18,KK02,00.012,0.012,0.012,station,https://www.thaipbs.or.th/news/content/506386,ข่าวพิมพ์ 00.012 ตีความเป็น 0.012
+18,KK05,0.011,0.011,0.011,station,https://www.thaipbs.or.th/news/content/506386,
+18,SA01,0.016,0.016,0.016,shared_value,https://www.thaipbs.or.th/news/content/506386,ข่าวให้ค่าเดียวสำหรับ SA01-SA03
+18,SA02,0.016,0.016,0.016,shared_value,https://www.thaipbs.or.th/news/content/506386,ข่าวให้ค่าเดียวสำหรับ SA01-SA03
+18,SA03,0.016,0.016,0.016,shared_value,https://www.thaipbs.or.th/news/content/506386,ข่าวให้ค่าเดียวสำหรับ SA01-SA03
+18,RU01,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thaipbs.or.th/news/content/506386,
+18,RU02,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thaipbs.or.th/news/content/506386,
+18,NK01,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thaipbs.or.th/news/content/506386,
+18,NK02,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thaipbs.or.th/news/content/506386,
+18,NK03,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thaipbs.or.th/news/content/506386,
+18,NK04,เป็นไปตามมาตรฐาน,,0.010,station,https://www.thaipbs.or.th/news/content/506386,
+19,KK01,0.012,0.012,0.012,station,https://www.thaipbs.or.th/news/content/507107,
+19,KK02,0.013,0.013,0.013,station,https://www.thaipbs.or.th/news/content/507107,
+19,KK05,0.013,0.013,0.013,station,https://www.thaipbs.or.th/news/content/507107,
+19,KK07,0.011,0.011,0.011,station,https://www.thaipbs.or.th/news/content/507107,
+19,SA01,0.041,0.041,0.041,station,https://www.thaipbs.or.th/news/content/507107,
+19,SA02,0.037,0.037,0.037,station,https://www.thaipbs.or.th/news/content/507107,
+19,SA03,0.039,0.039,0.039,station,https://www.thaipbs.or.th/news/content/507107,
+19,RU01,0.020,0.020,0.020,station,https://www.thaipbs.or.th/news/content/507107,ข่าวไม่ให้รหัส จับคู่จากชื่อ สถานีสูบน้ำเกาะช้าง กปภ.
+19,RU02,0.014,0.014,0.014,station,https://www.thaipbs.or.th/news/content/507107,ข่าวไม่ให้รหัส จับคู่จากชื่อ ต.เวียง อ.เชียงแสน
+19,NK01,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thaipbs.or.th/news/content/507107,
+19,NK02,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thaipbs.or.th/news/content/507107,
+19,NK03,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thaipbs.or.th/news/content/507107,
+20,KK01,0.019,0.019,0.019,station,https://www.thansettakij.com/sustainable/663745,
+20,KK02,0.019,0.019,0.019,station,https://www.thansettakij.com/sustainable/663745,
+20,KK05,0.015,0.015,0.015,station,https://www.thansettakij.com/sustainable/663745,
+20,KK07,0.015,0.015,0.015,station,https://www.thansettakij.com/sustainable/663745,
+20,KK09,0.012,0.012,0.012,station,https://www.thansettakij.com/sustainable/663745,
+20,KK11,0.012,0.012,0.012,station,https://www.thansettakij.com/sustainable/663745,
+20,KK12,0.011,0.011,0.011,station,https://www.thansettakij.com/sustainable/663745,
+20,SA01,0.023,0.023,0.023,station,https://www.thansettakij.com/sustainable/663745,
+20,SA02,0.022,0.022,0.022,station,https://www.thansettakij.com/sustainable/663745,
+20,SA03,0.018,0.018,0.018,station,https://www.thansettakij.com/sustainable/663745,
+20,RU01,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thansettakij.com/sustainable/663745,
+20,RU02,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thansettakij.com/sustainable/663745,
+20,NK01,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thansettakij.com/sustainable/663745,
+20,NK02,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thansettakij.com/sustainable/663745,
+20,NK03,เป็นไปตามมาตรฐานทุกจุด,,0.010,river_level,https://www.thansettakij.com/sustainable/663745,
+20,FA01,ปลอดภัย,,0.010,station,https://www.thansettakij.com/sustainable/663745,
+20,KO01,ปลอดภัย,,0.010,station,https://www.thansettakij.com/sustainable/663745,
+20,LA01,ปลอดภัย,,0.010,station,https://www.thansettakij.com/sustainable/663745,
+22,KK01,0.011,0.011,0.011,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+22,KK02,0.011,0.011,0.011,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+22,KK05,0.013,0.013,0.013,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+22,KK07,0.013,0.013,0.013,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+22,KK10,0.013,0.013,0.013,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+22,KK11,0.011,0.011,0.011,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+22,SA01,0.284,0.284,0.284,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+22,SA02,0.208,0.208,0.208,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+22,SA03,0.184,0.184,0.184,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+22,RU01,0.17,0.17,0.17,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+22,RU02,0.12,0.12,0.12,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+22,NK09,0.014,0.014,0.014,station,https://thestandard.co/thai-rivers-arsenic-lead/,รหัสใหม่ NK09 ยังไม่มีในตารางจุดตรวจ
+22,FA01,ปลอดภัย,,0.010,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+22,KO01,ปลอดภัย,,0.010,station,https://thestandard.co/thai-rivers-arsenic-lead/,ข่าวเขียนแม่น้ำกรณ์
+22,LA01,ปลอดภัย,,0.010,station,https://thestandard.co/thai-rivers-arsenic-lead/,
+23,SA01,0.017,0.017,0.017,station,https://www.bangkokbiznews.com/news/news-update/1258508,
+23,SA02,0.013,0.013,0.013,station,https://www.bangkokbiznews.com/news/news-update/1258508,
+23,SA03,0.012,0.012,0.012,station,https://www.bangkokbiznews.com/news/news-update/1258508,
+23,RU01,เป็นไปตามมาตรฐาน,,0.010,river_level,https://www.bangkokbiznews.com/news/news-update/1258508,
+23,RU02,เป็นไปตามมาตรฐาน,,0.010,river_level,https://www.bangkokbiznews.com/news/news-update/1258508,
+23,NK01,เป็นไปตามมาตรฐาน,,0.010,river_level,https://www.bangkokbiznews.com/news/news-update/1258508,
+23,NK02,เป็นไปตามมาตรฐาน,,0.010,river_level,https://www.bangkokbiznews.com/news/news-update/1258508,
+23,NK03,เป็นไปตามมาตรฐาน,,0.010,river_level,https://www.bangkokbiznews.com/news/news-update/1258508,
+23,KK01,เป็นไปตามมาตรฐาน,,0.010,river_level,https://www.bangkokbiznews.com/news/news-update/1258508,
+23,KK02,เป็นไปตามมาตรฐาน,,0.010,river_level,https://www.bangkokbiznews.com/news/news-update/1258508,
+23,KK05,เป็นไปตามมาตรฐาน,,0.010,river_level,https://www.bangkokbiznews.com/news/news-update/1258508,
+23,KK07,เป็นไปตามมาตรฐาน,,0.010,river_level,https://www.bangkokbiznews.com/news/news-update/1258508,

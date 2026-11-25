@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "1. ติดตั้งไลบรารี Python (ครั้งแรกครั้งเดียว)",
+      "type": "shell",
+      "command": "python -m venv .venv; .venv\Scripts\python -m pip install -r forecast\requirements.txt pdfplumber matplotlib",
+      "problemMatcher": []
+    },
+    {
+      "label": "2. พยากรณ์ใหม่ + ส่งข้อมูลให้เว็บ",
+      "type": "shell",
+      "command": ".venv\Scripts\python forecast\scripts\run_all.py --force; .venv\Scripts\python forecast\scripts\06_export_site.py",
+      "problemMatcher": []
+    },
+    {
+      "label": "3. สร้างรูปผลลัพธ์ (forecast/results)",
+      "type": "shell",
+      "command": ".venv\Scripts\python forecast\scripts\07_figures.py",
+      "problemMatcher": []
+    },
+    {
+      "label": "4. เปิดเว็บ (http://localhost:8000)",
+      "type": "shell",
+      "command": "python -m http.server 8000 --directory web",
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

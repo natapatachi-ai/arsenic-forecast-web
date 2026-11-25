@@ -1,0 +1,184 @@
+{
+  "_meta": {
+    "description": "ค่าคงที่และพารามิเตอร์ของแบบจำลองพยากรณ์สารหนู ทุกค่าระบุแหล่งที่มา ค่าใดที่ยังไม่มีแหล่งยืนยันกำหนดเป็น null พร้อมป้ายกำกับ [ต้องกำหนด]",
+    "version": "2026-11-24",
+    "rule": "ห้ามแทนค่าที่เป็น null ด้วยค่าที่ไม่มีแหล่งอ้างอิง"
+  },
+  "standards": {
+    "surface_water_As_mgL": {
+      "value": 0.01,
+      "source": "มาตรฐานคุณภาพน้ำในแหล่งน้ำผิวดิน (กรมควบคุมมลพิษ) ตามที่อ้างในรายงาน คพ.",
+      "url": "https://www.pcd.go.th/wp-content/uploads/2025/09/pcdnew-2025-09-15_08-53-08_171613.pdf"
+    },
+    "drinking_water_As_mgL": {
+      "value": 0.01,
+      "source": "เกณฑ์คุณภาพน้ำประปาดื่มได้ กรมอนามัย"
+    },
+    "groundwater_As_mgL": {
+      "value": 0.01,
+      "source": "มาตรฐานคุณภาพน้ำใต้ดิน"
+    },
+    "sediment_As_safe_mgkg": {
+      "value": 10,
+      "source": "มาตรฐานคุณภาพตะกอนดินระดับที่ปลอดภัยต่อสัตว์หน้าดิน ตามที่อ้างในรายงานตะกอน คพ."
+    },
+    "sediment_As_harm_mgkg": {
+      "value": 33,
+      "source": "ระดับที่เป็นอันตรายต่อสัตว์หน้าดินอย่างรุนแรง (≥33) รายงานตะกอนรอบ 13",
+      "url": "https://epo01.pcd.go.th/attachment/iu/download.php?WP=qUIcnKt5pQEgZKqCGWOghJstqTgcWat3pQSgZUpjGQIgG2rDqYyc4Uux"
+    },
+    "sediment_metals_mgkg": {
+      "source": "คพ. รายงานตะกอนดินรอบ 13 ภาคผนวก ข (safe = ระดับปลอดภัยต่อสัตว์หน้าดิน, severe = อันตรายอย่างรุนแรง)",
+      "As": [
+        10,
+        33
+      ],
+      "Cd": [
+        1,
+        5
+      ],
+      "Ni": [
+        23,
+        50
+      ],
+      "Pb": [
+        36,
+        130
+      ],
+      "Zn": [
+        120,
+        460
+      ],
+      "Cu": [
+        31.5,
+        150
+      ],
+      "Hg": [
+        0.2,
+        1.0
+      ],
+      "Cr": [
+        43.4,
+        110
+      ],
+      "Mn": [
+        null,
+        null
+      ]
+    },
+    "surface_water_metals_mgL": {
+      "As": 0.01,
+      "Pb": 0.05,
+      "Hg": 0.002,
+      "Cu": 0.1,
+      "Zn": 1.0,
+      "Ni": 0.1,
+      "Cd": {
+        "hardness_le_100": 0.005,
+        "hardness_gt_100": 0.05
+      },
+      "Mn": 1.0,
+      "source": "มาตรฐานคุณภาพน้ำในแหล่งน้ำผิวดิน (ประกาศคณะกรรมการสิ่งแวดล้อมแห่งชาติ ฉบับที่ 8 พ.ศ. 2537); ค่า As และ Cd ยืนยันจากภาคผนวก ก รายงานน้ำครั้งที่ 24",
+      "note": "ชุดข้อมูลใช้ Cd 0.005 (กรณีความกระด้าง <=100 mg/L) เพราะรายงานไม่มีค่าความกระด้าง"
+    }
+  },
+  "detection_limits": {
+    "water_As_LOD_mgL": {
+      "value": 0.01,
+      "source": "ตาราง คพ. รายงานค่าต่ำกว่าเป็น <0.010"
+    },
+    "sediment_As_LOD_mgkg": {
+      "value": 5.0,
+      "source": "ตาราง คพ. รายงานค่าต่ำกว่าเป็น <5.0"
+    }
+  },
+  "chemistry": {
+    "pKa_AsV": {
+      "value": [
+        2.22,
+        6.98,
+        11.53
+      ],
+      "species": "H3AsO4 / H2AsO4- / HAsO4^2- / AsO4^3-",
+      "source": "Smedley & Kinniburgh (2002) Applied Geochemistry 17:517-568"
+    },
+    "pKa_AsIII": {
+      "value": [
+        9.23
+      ],
+      "species": "H3AsO3 / H2AsO3-",
+      "source": "Smedley & Kinniburgh (2002)"
+    },
+    "E0_H3AsO4_HAsO2_V": {
+      "value": 0.56,
+      "source": "ตารางศักย์ไฟฟ้ามาตรฐาน (CRC Handbook of Chemistry and Physics)"
+    },
+    "log10_Kd_Lkg": {
+      "suspended_matter": {
+        "central": 4.0,
+        "min": 2.0,
+        "max": 6.0,
+        "n": 25
+      },
+      "sediment": {
+        "central": 2.5,
+        "min": 1.6,
+        "max": 4.3,
+        "n": 18
+      },
+      "soil": {
+        "central": 3.4,
+        "min": 0.3,
+        "max": 4.3,
+        "n": 22
+      },
+      "source": "U.S. EPA (2005) Partition Coefficients for Metals in Surface Water, Soil, and Waste, EPA/600/R-05/074",
+      "use": "prior ของ Kd ในสมการ f_p = Kd*TSS*1e-6/(1+Kd*TSS*1e-6) ใช้แบบ log-uniform หรือ normal ในหน่วย log10"
+    }
+  },
+  "toxicity": {
+    "RfD_oral_mgkgd": {
+      "value": 6e-05,
+      "previous": 0.0003,
+      "source": "U.S. EPA IRIS Inorganic Arsenic (2025)"
+    },
+    "CSF_oral_per_mgkgd": {
+      "value": 32,
+      "previous": 1.5,
+      "source": "U.S. EPA IRIS Inorganic Arsenic (2025)"
+    },
+    "note": "รายงานผลทั้งค่าใหม่และค่าเดิมเป็นการวิเคราะห์ความไว"
+  },
+  "exposure_factors": {
+    "_note": "[ต้องกำหนด] ใช้ค่าจากแหล่งไทยก่อน เช่น กรมอนามัย หรือ คู่มือประเมินความเสี่ยงสุขภาพ หากไม่มีจึงใช้ U.S. EPA Exposure Factors Handbook และระบุฉบับ",
+    "drinking_water_intake_L_per_day": null,
+    "body_weight_kg": null,
+    "exposure_frequency_days_per_year": null,
+    "exposure_duration_years": null,
+    "averaging_time_noncancer_days": "ED*365",
+    "averaging_time_cancer_days": null,
+    "fish_intake_g_per_day": null,
+    "fish_BAF_Lkg": null,
+    "inorganic_fraction_in_fish": null
+  },
+  "model": {
+    "log_base": "natural",
+    "reference_interval_days": 14,
+    "quantiles": [
+      0.1,
+      0.5,
+      0.9
+    ],
+    "exceedance_threshold_mgL": 0.01,
+    "monte_carlo_N": 5000,
+    "ridge_lambda_station": 2.0,
+    "min_obs_per_station": 3,
+    "default_forecast_gap_days": 28,
+    "validation_start_round": 6
+  },
+  "sampling_frequency": {
+    "water": "เดือนละ 2 ครั้ง (มี.ค.–ก.ย. 2568) แล้วเดือนละ 1 ครั้ง ตั้งแต่ พ.ย. 2568",
+    "sediment": "เดือนละ 1 ครั้ง (พ.ค.–ก.ย. 2568) แล้วทุก 2 เดือน ตั้งแต่ พ.ย. 2568",
+    "source": "รายงานตะกอนรอบ 13 หัวข้อ 2"
+  }
+}

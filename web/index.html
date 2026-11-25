@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>สารหนูไหลไปทางไหน</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%227%22 fill=%22%23dc2626%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: public river bulletin; the finding first, every number dated, forecasts always labelled as forecasts
+   IDEA: a daylight river-weather map: arsenic is the weather, rivers are the jet stream
+   COLOUR: paper white, river ink #10202B, slate #566373, measured = ink/solid, forecast = #1F5FD1/dashed, standard = #C8281E; data ramp teal -> amber -> orange -> red
+   TYPE: Sarabun (open version of TH Sarabun New, the Thai government standard face) for everything, headings at 700
+   LAYOUT: shader banner with a live finding sentence; three maps (actual / forecast / compare) each with its own table; provinces in downstream order with status on the left rule; treatment as status-first rows
+   BOLD THING: the flowing particle maps; everything else stays quiet */
+:root{color-scheme:light;--bg:#ffffff;--panel:#f8fafc;--panel2:#f1f5f9;--line:rgba(15,23,42,.08);--line2:rgba(15,23,42,.14);
+ --ink:#0f172a;--mute:#5b6577;--dim:#8a93a3;--blue:#2563eb;--fc:#2563eb;--fcband:rgba(37,99,235,.13);--red:#dc2626;--org:#ea580c;--yel:#ca8a04;--teal:#0d9488}
+*{box-sizing:border-box;min-width:0}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.65 "Sarabun","TH Sarabun New",system-ui,sans-serif;overflow-x:clip;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(4vw,16px)}
+.band{padding:clamp(48px,7vw,96px) 0;border-top:1px solid var(--line)}
+h1,h2,h3{font-weight:500;letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1{font-size:clamp(36px,5.6vw,68px);line-height:1.06}
+h1 .sub,h2 .sub{font-size:.58em;line-height:1.25;margin-top:.25em;display:block}
+h2{font-size:clamp(28px,3.6vw,44px);line-height:1.08}
+h3{font-size:17px;line-height:1.3}
+.sub{color:var(--mute)}
+.head{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:24px 48px;align-items:end;margin-bottom:32px}
+.head p{margin:0;color:var(--mute);max-width:56ch}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 20px;border-radius:999px;border:1px solid var(--line2);background:#fff;color:var(--ink);font:500 14px/1 inherit;text-decoration:none;cursor:pointer}
+.btn:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.tag{font-size:12px;color:var(--mute);border:1px solid var(--line2);border-radius:999px;padding:2px 10px;white-space:nowrap;background:#fff}
+/* nav: liquid glass pill, daylight */
+.top{position:fixed;inset:12px 0 auto;z-index:20;display:flex;justify-content:center;pointer-events:none;padding:0 12px}
+.brand{position:absolute;left:max(4vw,16px);top:8px;font:600 15px/1 "Sarabun","TH Sarabun New",sans-serif;display:flex;gap:8px;align-items:center;pointer-events:auto;text-decoration:none}
+.brand i{width:22px;height:22px;border-radius:7px;background:conic-gradient(from 210deg,#0d9488,#ca8a04,#dc2626,#0d9488);display:block}
+.pill{pointer-events:auto;position:relative;display:flex;gap:2px;padding:5px;border-radius:999px;isolation:isolate;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.pill::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:-2;background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6);
+ box-shadow:inset 0 1px 1px rgba(255,255,255,.9),inset 0 0 0 1px rgba(15,23,42,.07),0 14px 34px -16px rgba(15,23,42,.35)}
+.drop{position:absolute;top:5px;bottom:5px;left:0;border-radius:999px;z-index:-1;will-change:transform,width;
+ background:radial-gradient(120% 140% at 30% 0%,rgba(255,255,255,.95),rgba(255,255,255,.4) 60%),rgba(37,99,235,.08);
+ box-shadow:inset 0 1px 1px #fff,inset 0 -2px 6px rgba(37,99,235,.18),inset 0 0 0 1px rgba(37,99,235,.18),0 6px 16px -8px rgba(37,99,235,.55)}
+.pill a{position:relative;display:inline-flex;align-items:center;height:38px;padding:0 14px;border-radius:999px;color:var(--mute);text-decoration:none;font-size:14px;white-space:nowrap;flex:none;transition:color .25s}
+.pill a[aria-current]{color:var(--ink)}
+/* hero */
+.hero{padding-top:88px;padding-bottom:28px}
+.hx{position:relative;border-radius:32px;overflow:hidden;padding:clamp(36px,6vw,72px) clamp(22px,5vw,56px) clamp(28px,4vw,44px);background:#0B1026;color:#fff;isolation:isolate}
+.hx canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-2;display:block}
+.hx::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(11,16,38,.88) 0%,rgba(11,16,38,.62) 48%,rgba(11,16,38,.12) 100%)}
+.hx h1 .sub{color:rgba(255,255,255,.78)}
+.hx .tag{white-space:normal;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);color:rgba(255,255,255,.86)}
+.hx .btn{background:#fff;color:#0B1026;border-color:#fff}
+.hero-row{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin-top:24px}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+/* map console */
+.console{position:relative;border:1px solid var(--line2);border-radius:28px;overflow:hidden;background:radial-gradient(120% 90% at 70% 10%,#f4f8ff 0%,#eef3f9 60%,#e9eef5 100%);height:min(78vh,780px);min-height:540px}
+.console canvas{position:absolute;inset:0;width:100%;height:100%}
+.ctl{position:absolute;display:flex;gap:8px;flex-wrap:wrap;z-index:2}
+.ctl.tl{left:16px;top:16px;right:250px}.ctl.tr{right:16px;top:16px;flex-direction:column;align-items:flex-end}
+.seg{display:inline-flex;flex-wrap:wrap;padding:4px;border-radius:20px;background:rgba(255,255,255,.78);border:1px solid var(--line2);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.seg button{min-height:36px;padding:0 13px;border:0;border-radius:999px;background:none;color:var(--mute);font:500 13px/1 inherit;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.legend{background:rgba(255,255,255,.86);border:1px solid var(--line2);border-radius:16px;padding:10px 12px;font-size:12px;color:var(--mute);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);width:226px}
+.ramp{height:8px;border-radius:4px;background:linear-gradient(90deg,#0d9488,#ca8a04 30%,#ea580c 55%,#dc2626 80%,#be123c);margin:6px 0 4px}
+.ramp-l{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.key{display:flex;align-items:center;gap:8px;margin-top:6px}.key i{width:16px;height:10px;border-radius:3px;display:block;flex:none}
+.time{position:absolute;left:16px;right:16px;bottom:16px;z-index:2;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:10px 14px;border-radius:18px;background:rgba(255,255,255,.86);border:1px solid var(--line2);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.play{width:40px;height:40px;border-radius:50%;border:1px solid var(--line2);background:#fff;color:var(--ink);cursor:pointer;display:grid;place-items:center}
+input[type=range]{width:100%;accent-color:var(--ink);height:28px}
+.tlabel{font-size:13px;white-space:nowrap;text-align:right;min-width:170px}
+.tlabel b{display:block;font-weight:500;color:var(--ink)}.tlabel span{color:var(--mute)}
+.tlabel b.fc{color:var(--fc)}
+.card{position:absolute;z-index:3;left:16px;top:118px;width:min(320px,calc(100% - 32px));padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.95);border:1px solid var(--line2);box-shadow:0 18px 40px -20px rgba(15,23,42,.35);font-size:13px;display:none}
+.card.on{display:block}
+.card .v{font-size:30px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1;margin:6px 0 2px}
+.card .x{position:absolute;right:8px;top:8px;width:32px;height:32px;border:0;border-radius:50%;background:none;color:var(--mute);cursor:pointer;font-size:18px}
+.tip{position:absolute;z-index:4;pointer-events:none;padding:6px 10px;border-radius:10px;background:rgba(15,23,42,.92);color:#fff;font-size:12px;white-space:nowrap;transform:translate(-50%,-130%);display:none}
+.note{font-size:12.5px;color:var(--mute);margin-top:10px}
+/* metric cards (Peak-chart style, daylight) */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.peak{position:relative;border-radius:28px;overflow:hidden;background:#f6f9ff;border:1px solid rgba(37,99,235,.14);aspect-ratio:540/560}
+.peak canvas{position:absolute;inset:0;width:100%;height:100%}
+.peak .p-up{position:absolute;left:22px;top:20px;font-size:13px;color:var(--mute)}
+.peak .p-t{position:absolute;left:0;right:0;bottom:31%;text-align:center;color:var(--mute);font-size:14px;padding:0 16px}
+.peak .p-v{position:absolute;left:0;right:0;bottom:13%;text-align:center;font-size:clamp(40px,5vw,60px);font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1;color:var(--ink)}
+.peak .p-v small{font-size:.38em;font-weight:400;color:var(--mute);margin-left:4px}
+.peak .p-c{position:absolute;left:0;right:0;bottom:5%;text-align:center;font-size:12px;color:var(--mute);padding:0 16px}
+/* provinces */
+.provs{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.prov{border:1px solid var(--line);border-radius:22px;padding:18px;background:#fff}
+.prov.red{border-color:rgba(220,38,38,.4);background:linear-gradient(180deg,rgba(220,38,38,.06),#fff 55%)}
+.prov.watch{border-color:rgba(234,88,12,.35);background:linear-gradient(180deg,rgba(234,88,12,.05),#fff 55%)}
+.prov.nodata{background:repeating-linear-gradient(135deg,#fff 0 10px,#f6f7f9 10px 20px)}
+.prov h3{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:20px}
+.prov .ddc{display:flex;gap:16px;margin:10px 0 4px;font-size:13px;color:var(--mute)}
+.prov .ddc b{display:block;font-size:20px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.prov ul{list-style:none;margin:10px 0 0;padding:0;font-size:13px}
+.prov li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;padding:6px 0;border-top:1px solid var(--line)}
+.prov li b{font-weight:500;font-variant-numeric:tabular-nums;text-align:right}
+.prov li span.s{color:var(--mute)}
+.prov .loc{margin-top:10px;font-size:13px;color:var(--mute)}
+.prov .loc p{margin:6px 0 0}
+.prov .loc a{color:var(--blue)}
+.badge{font-size:12px;border-radius:999px;padding:2px 10px;white-space:nowrap;font-weight:500}
+.b-red{background:rgba(220,38,38,.1);color:#b91c1c}.b-watch{background:rgba(234,88,12,.1);color:#c2410c}.b-ok{background:rgba(13,148,136,.1);color:#0f766e}.b-none{background:#eef1f5;color:var(--mute)}.b-fc{background:rgba(37,99,235,.1);color:#1d4ed8}
+/* compare */
+.cmp{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+.cmp .panel{border:1px solid var(--line);border-radius:22px;padding:18px;background:#fff}
+.lg{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--mute);margin:4px 0 10px}
+.lg span{display:inline-flex;align-items:center;gap:8px}
+.chart{width:100%;height:auto;display:block}
+select{min-height:44px;padding:0 12px;border-radius:12px;border:1px solid var(--line2);background:#fff;font:inherit;color:var(--ink);max-width:100%}
+.ctrls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
+.mbox{border:1px solid var(--line);border-radius:18px;padding:14px 16px;background:var(--panel);margin-bottom:10px}
+.mbox .big{font-size:26px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.mbox p{margin:4px 0 0;color:var(--mute);font-size:13px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-weight:500;color:var(--mute);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line2);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.fc,th.fc{color:var(--fc)}
+.spark{width:150px;height:34px;display:block}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;vertical-align:middle}
+/* forecast bars */
+.fgroup{margin-bottom:28px}.fgroup h3{margin-bottom:10px}
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:190px minmax(0,1fr) 64px;gap:12px;align-items:center;font-size:14px}
+.bar .tr{position:relative;height:24px;border-radius:8px;background:var(--panel2);overflow:hidden}
+.bar .fl{position:absolute;inset:0 auto 0 0;border-radius:8px;background:repeating-linear-gradient(135deg,rgba(37,99,235,.85) 0 6px,rgba(37,99,235,.65) 6px 12px)}
+.bar .half{position:absolute;top:0;bottom:0;left:50%;border-left:1px dashed rgba(15,23,42,.35)}
+.bar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--fc)}
+.bar small{color:var(--mute);display:block;font-size:12px}
+/* flow route */
+.routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.route{border:1px solid var(--line);border-radius:22px;padding:18px 18px 8px;background:#fff}
+.route h3{margin-bottom:12px}
+.route ol{list-style:none;margin:0;padding:0;position:relative}
+.route ol::before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:linear-gradient(#93c5fd,#2563eb)}
+.route li{position:relative;padding:0 0 14px 28px;font-size:14px}
+.route li::before{content:"";position:absolute;left:1px;top:6px;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid #2563eb}
+.route li.nd::before{border-color:#a8b0bd;border-style:dashed}
+.route .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{font-size:12px;border-radius:999px;padding:2px 9px;border:1px solid var(--line2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.route .nd-t{color:var(--dim);font-size:13px}
+.route .nt{color:var(--mute);font-size:13px;margin-top:4px}
+/* treatment */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.tcard{border:1px solid var(--line);border-radius:22px;padding:18px;background:#fff;display:grid;gap:8px;align-content:start}
+.tcard .row{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.tcard .k{font-size:12px;color:var(--mute);text-transform:none}
+.tcard p{margin:0;font-size:14px}
+.tcard .res{background:var(--panel);border-radius:12px;padding:10px 12px;font-size:14px}
+.tcard a{color:var(--blue);font-size:13px}
+.st-done{background:rgba(13,148,136,.1);color:#0f766e}.st-running{background:rgba(37,99,235,.1);color:#1d4ed8}.st-planned{background:rgba(202,138,4,.12);color:#a16207}.st-cancelled{background:#eef1f5;color:#4b5563}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.box{border:1px solid var(--line);border-radius:22px;padding:22px;background:var(--panel)}
+.box .big{font-size:34px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin:4px 0}
+.box p{margin:8px 0 0;color:var(--mute);font-size:15px}
+.eq{font:14px/1.7 "Sarabun","TH Sarabun New",sans-serif;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;overflow-x:auto;white-space:nowrap;color:#1e293b}
+.adv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.adv .box h3{margin-bottom:6px}
+footer{border-top:1px solid var(--line);padding:40px 0 60px;color:var(--mute);font-size:13px}
+footer a{color:var(--ink)}
+.err{padding:24px;border:1px solid rgba(220,38,38,.4);border-radius:16px;color:#b91c1c;display:none}
+@media(max-width:980px){.cmp{grid-template-columns:minmax(0,1fr)}.routes{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:900px){.head,.cards,.grid3,.adv{grid-template-columns:minmax(0,1fr)}.brand{display:none}.peak{aspect-ratio:540/420}}
+@media(max-width:600px){.console{height:auto;min-height:0}.console .stage{position:relative;height:66vh;min-height:440px}
+ .ctl.tl{right:16px}.legend{width:auto}.ctl.tr{display:none}.time{position:relative;left:0;right:0;bottom:0;border-radius:0;border-width:1px 0 0}
+ .card{top:auto;bottom:12px}.tlabel{min-width:0}.bar{grid-template-columns:110px minmax(0,1fr) 48px}.spark{width:96px}.provs,.tgrid{grid-template-columns:minmax(0,1fr)}
+ table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8.5em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:8em;margin-inline-start:-8.5em;color:var(--mute)}.stack td:empty{display:none}}
+@media(min-width:601px){.console .stage{position:absolute;inset:0}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.pill a{transition:none}}
+
+/* ---- v3: three maps, pan/zoom, hover, tables ---- */
+.mapsec{padding-top:clamp(40px,6vw,80px)}
+.kind{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;border-radius:999px;padding:4px 12px;margin-bottom:12px}
+.kind.obs{background:#0f172a;color:#fff}.kind.fc{background:#2563eb;color:#fff}.kind.cmp{background:linear-gradient(90deg,#0f172a 50%,#2563eb 50%);color:#fff}
+.console.fcm{background:radial-gradient(120% 90% at 70% 10%,#f2f7ff 0%,#e8f0fd 60%,#e3ecfb 100%);border-color:rgba(37,99,235,.28)}
+.zoom{position:absolute;right:16px;bottom:96px;z-index:3;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;border:1px solid var(--line2);background:rgba(255,255,255,.9)}
+.zoom button{width:40px;height:40px;border:0;background:none;font:500 18px/1 "Sarabun","TH Sarabun New";color:var(--ink);cursor:pointer}
+.zoom button+button{border-top:1px solid var(--line)}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;background:rgba(15,23,42,.82);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;pointer-events:none;opacity:0;transition:opacity .25s}
+.hint.on{opacity:1}
+.tip{white-space:normal;width:max-content;max-width:300px;line-height:1.45;padding:8px 12px}
+.tip b{font-weight:600}.tip .r{display:flex;justify-content:space-between;gap:14px}.tip .o{color:#fff}.tip .f{color:#93c5fd}.tip .m{color:#cbd5e1;font-size:11px}
+.swipe{position:absolute;top:0;bottom:0;z-index:3;width:0;pointer-events:none}
+.swipe::before{content:"";position:absolute;top:0;bottom:0;left:-1px;width:2px;background:#0f172a;box-shadow:0 0 0 1px rgba(255,255,255,.8)}
+.swipe .knob{position:absolute;top:50%;left:-22px;width:44px;height:44px;margin-top:-22px;border-radius:50%;background:#fff;border:2px solid #0f172a;display:grid;place-items:center;pointer-events:auto;cursor:ew-resize;box-shadow:0 6px 16px -6px rgba(15,23,42,.5);touch-action:none}
+.swipe .lab{position:absolute;top:64px;font-size:12px;font-weight:500;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.swipe .lab.l{right:10px;background:#0f172a;color:#fff}.swipe .lab.r{left:10px;background:#2563eb;color:#fff}
+.hzseg button[aria-pressed=true]{background:#2563eb}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 10px;align-items:center}
+.tbl{border:1px solid var(--line);border-radius:20px;padding:6px 8px;background:#fff}
+.tbl caption{caption-side:top;text-align:left;padding:10px 12px 4px;font-weight:500;color:var(--ink)}
+tr.grp td{background:var(--panel);font-weight:500;color:var(--mute);font-size:13px}
+.fcv{color:var(--fc)}.fcv small{display:block;color:#64748b;font-size:11.5px}
+.ok-t{color:#0f766e}.bad-t{color:#c2410c}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:40;background:#0f172a;color:#fff;border-radius:14px;padding:10px 14px;display:none;gap:12px;align-items:center;box-shadow:0 14px 30px -12px rgba(15,23,42,.6);font-size:14px}
+.toast.on{display:flex}.toast button{min-height:36px;border-radius:999px;border:0;background:#fff;color:#0f172a;padding:0 14px;font:500 13px inherit;cursor:pointer}
+.live{display:inline-flex;align-items:center;gap:6px}.live i{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.25)}
+
+/* ---- design pass: river-bulletin identity ---- */
+:root{--ink:#10202B;--mute:#566373;--fc:#1F5FD1;--blue:#1F5FD1;--red:#C8281E}
+h1,h2,h3,.big,.p-v,.card .v,.tlabel b,.kind,.seg button,.btn,.pill a,.prov .ddc b,.mbox .big{font-family:"Sarabun","TH Sarabun New",sans-serif}
+h1{font-size:clamp(44px,6.4vw,80px);font-weight:700;letter-spacing:0;line-height:1.08}
+h2{font-size:clamp(32px,3.8vw,46px);font-weight:700;letter-spacing:0;line-height:1.12}
+h3{font-size:20px;font-weight:600;letter-spacing:0}
+h1 .sub,h2 .sub{font-family:"Sarabun","TH Sarabun New",sans-serif;font-weight:400}
+.head p{font-size:16px}
+.finding{font-size:clamp(19px,2.1vw,25px);line-height:1.5;max-width:40ch;margin:18px 0 0;color:#fff}
+.finding b{font-weight:600;color:#FFD6E7}
+.finding small{display:block;font-size:14px;color:rgba(255,255,255,.72);margin-top:8px}
+/* provinces: ordered downstream; the left rule carries the status */
+.provs{gap:28px 40px}
+.prov{border:0;border-left:4px solid #CBD5E1;border-radius:0;background:none;padding:2px 0 2px 18px}
+.prov.red{border-left-color:var(--red);background:none}.prov.ok{border-left-color:#0d9488}.prov.watch{border-left-color:#ea580c;background:none}
+.prov.nodata{border-left:4px dashed #A8B0BD;background:none}
+.prov h3{font-size:24px}
+.prov ul{margin-top:12px}
+/* treatment: one row per measure, status first */
+.tgrid{display:block;border-top:1px solid var(--line2)}
+.trow{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1.3fr) minmax(0,1.3fr);gap:8px 28px;padding:22px 0;border-bottom:1px solid var(--line)}
+.trow h3{font-size:18px;margin-bottom:4px}
+.trow p{margin:0;font-size:15px}
+.trow .k{font-size:13px;color:var(--mute);display:block;margin-bottom:4px}
+.trow .badge{display:inline-block;margin-bottom:8px}
+.trow a{color:var(--blue);font-size:13px;display:inline-block;margin-top:8px}
+.trow .res{background:none;padding:0;border-left:3px solid var(--line2);padding-left:12px}
+@media(max-width:900px){.trow{grid-template-columns:minmax(0,1fr)}}
+/* ---- my area finder ---- */
+.finder{display:grid;grid-template-columns:320px minmax(0,1fr);gap:28px;align-items:start}
+.fctl{display:grid;gap:6px;position:sticky;top:84px}
+.fctl label{font-weight:600;font-size:16px;margin-top:8px}
+.fctl select,.fctl input{min-height:52px;font-size:18px;line-height:1.3;font-family:inherit;padding:0 14px;border:1.5px solid #B8C4D0;border-radius:12px;background:#fff;color:var(--ink);width:100%}
+.fctl select:disabled{background:#F2F5F8;color:#8A94A3}
+.fctl .or{font-size:14px;color:var(--mute);margin-top:12px;padding-top:12px;border-top:1px solid var(--line2)}
+.sbox{position:relative}
+.sbox ul{position:absolute;z-index:6;left:0;right:0;top:calc(100% + 4px);list-style:none;margin:0;padding:6px;background:#fff;border:1px solid var(--line2);border-radius:12px;box-shadow:0 18px 40px -18px rgba(16,32,43,.4);display:none;max-height:340px;overflow:auto}
+.sbox ul.on{display:block}
+.sbox li{padding:10px 12px;border-radius:8px;cursor:pointer;font-size:17px}
+.sbox li small{display:block;color:var(--mute);font-size:14px}
+.sbox li[aria-selected=true],.sbox li:hover{background:#EEF3F8}
+.hintx{font-size:14px;color:var(--mute);margin:8px 0 0}
+.areport{border:1.5px solid var(--line2);border-radius:20px;overflow:hidden;background:#fff;min-height:320px}
+.areport .empty{padding:40px 32px;color:var(--mute);font-size:18px}
+.aband{padding:26px 30px 22px;color:#fff}
+.aband.s-red{background:#B42318}.aband.s-orange{background:#C2410C}.aband.s-yellow{background:#8A6100}.aband.s-green{background:#0F6E5C}
+.aband .where{font-size:17px;opacity:.92}
+.aband .lvl{font-size:clamp(30px,3.6vw,42px);font-weight:700;line-height:1.15;margin:4px 0 6px}
+.aband p{margin:0;font-size:18px;line-height:1.6;max-width:60ch}
+.abody{padding:8px 30px 26px}
+.arow{display:grid;grid-template-columns:190px minmax(0,1fr);gap:6px 24px;padding:16px 0;border-bottom:1px solid var(--line)}
+.arow:last-child{border-bottom:0}
+.arow>h3{font-size:18px;margin:0}
+.arow .v{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.arow .v.fc{color:var(--fc)}
+.arow p{margin:4px 0 0;font-size:17px}
+.arow .m{color:var(--mute);font-size:15px}
+.arow ul{margin:6px 0 0;padding-left:20px;font-size:17px}
+.arow li{margin:4px 0}
+.arow a{color:var(--blue)}
+.arow .spark{width:100%;max-width:440px;height:auto}
+.others{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.others span{font-size:15px;border:1px solid var(--line2);border-radius:8px;padding:2px 8px}
+.tagfc{display:inline-block;font-size:13px;font-weight:600;color:#fff;background:var(--fc);border-radius:6px;padding:1px 8px;margin-left:6px;vertical-align:middle}
+.tagob{display:inline-block;font-size:13px;font-weight:600;color:#fff;background:var(--ink);border-radius:6px;padding:1px 8px;margin-left:6px;vertical-align:middle}
+.abtn{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+@media(max-width:900px){.finder{grid-template-columns:minmax(0,1fr)}.fctl{position:static}.arow{grid-template-columns:minmax(0,1fr)}.aband,.abody{padding-left:20px;padding-right:20px}}
+@media(max-width:600px){.zoom{bottom:12px;right:12px}.swipe .lab{top:118px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#top"><i></i>Arsenic Watch</a>
+  <nav class="pill" id="pill" aria-label="เมนูหลัก">
+    <span class="drop" id="drop" aria-hidden="true"></span>
+    <a href="#myarea">พื้นที่ของฉัน</a><a href="#actual">ค่าจริง</a><a href="#fcmap">พยากรณ์</a><a href="#cmpmap">เปรียบเทียบ</a><a href="#provinces">จังหวัด</a><a href="#flow">ไหลไปไหน</a><a href="#treatment">การบำบัด</a><a href="#method">วิธีการ</a><a href="#advice">คำแนะนำ</a>
+  </nav>
+</header>
+<main id="top">
+<section class="hero wrap">
+ <div class="hx"><canvas id="shader" aria-hidden="true"></canvas>
+  <h1>สารหนูไหลไปทางไหน</h1>
+  <p class="finding" id="finding">กำลังอ่านผลตรวจล่าสุด</p>
+  <div class="hero-row">
+    <div class="meta" id="meta"><span class="tag">กำลังโหลดข้อมูล…</span></div>
+  </div>
+  <div class="hero-row"><a class="btn" href="#myarea" style="background:#FFD6E7;color:#10202B;border-color:#FFD6E7">ดูพื้นที่ของฉัน</a><a class="btn" href="#actual">แผนที่ค่าจริง</a><a class="btn" href="#fcmap" style="background:#2563eb;color:#fff;border-color:#2563eb">แผนที่พยากรณ์</a><a class="btn" href="#cmpmap" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.5)">เปรียบเทียบ</a></div>
+ </div>
+</section>
+
+<!-- ============ 0) MY AREA ============ -->
+<section class="wrap mapsec" id="myarea">
+  <div class="head"><h2>พื้นที่ของฉัน<span class="sub">เลือกจังหวัด อำเภอ และตำบลที่คุณอยู่ ระบบจะบอกว่าแม่น้ำใกล้บ้านมีสารหนูเท่าไร คาดว่าจะเป็นอย่างไร และควรทำอย่างไร</span></h2>
+    <p>ครอบคลุมทุกจังหวัดและอำเภอทั่วประเทศ ตำบลมีให้เลือกใน 13 จังหวัดที่มีพื้นที่ห่างจากแม่น้ำที่ตรวจพบสารหนูไม่เกิน 30 กิโลเมตร จังหวัดอื่นไม่ได้รับน้ำจากแม่น้ำเหล่านี้ จึงแสดงผลระดับอำเภอ</p></div>
+  <div class="finder">
+    <div class="fctl">
+      <label for="aq">พิมพ์ชื่อตำบล อำเภอ หรือจังหวัด</label>
+      <div class="sbox"><input id="aq" type="search" autocomplete="off" placeholder="เช่น เชียงคาน หรือ แม่สาย" aria-controls="asug" aria-expanded="false"><ul id="asug" role="listbox"></ul></div>
+      <div class="or">หรือเลือกทีละขั้น</div>
+      <label for="ap">จังหวัด</label><select id="ap"></select>
+      <label for="aa">อำเภอ</label><select id="aa"></select>
+      <label for="at">ตำบล</label><select id="at"></select>
+      <p class="hintx" id="ahint"></p>
+    </div>
+    <div class="areport" id="areport" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ============ 1) ACTUAL ============ -->
+<section class="wrap mapsec" id="actual">
+  <span class="kind obs">● ค่าตรวจวัดจริง</span>
+  <div class="head"><h2>แผนที่ค่าจริง<span class="sub">ผลตรวจของกรมควบคุมมลพิษและสำนักงานสิ่งแวดล้อมฯ เท่านั้น ไม่มีค่าพยากรณ์ปน</span></h2>
+    <p>เลื่อนแถบเวลาเพื่อดูแต่ละวันเก็บตัวอย่าง ลากเพื่อเลื่อนแผนที่ ใช้ปุ่ม + − หรือ Ctrl + ลูกกลิ้งเพื่อซูม (มือถือใช้สองนิ้ว) วางเมาส์บนแม่น้ำหรือจุดตรวจเพื่อดูชื่อ ค่าจริง และค่าพยากรณ์ของตำแหน่งนั้น</p></div>
+  <div id="mapObs"></div>
+  <div class="filters" role="group" aria-label="กรองตาราง"><span class="sub" style="font-size:14px">ตารางค่าจริง:</span><div class="seg" id="fObs"></div></div>
+  <div class="scroll tbl"><table class="stack" id="tObs"><caption>ค่าตรวจวัดล่าสุดของทุกจุด (มก./ล.)</caption><thead><tr><th>จุดตรวจ</th><th>แม่น้ำ</th><th>พื้นที่</th><th>ค่าจริงล่าสุด</th><th>วันเก็บตัวอย่าง</th><th>ประวัติค่าจริง</th><th>เกินมาตรฐาน</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section class="band" style="padding-top:56px;margin-top:56px">
+  <div class="wrap cards" id="cards"></div>
+</section>
+
+<!-- ============ 2) FORECAST ============ -->
+<section class="band" id="fcmap">
+ <div class="wrap">
+  <span class="kind fc">◆ ค่าพยากรณ์ล่วงหน้า (ไม่ใช่ค่าตรวจวัด)</span>
+  <div class="head"><h2>แผนที่พยากรณ์<span class="sub">พยากรณ์ล่วงหน้า 1–3 รอบของแต่ละเครือข่าย สีคือค่ากลาง P50 พื้นที่สีแดงคือโอกาสเกินมาตรฐานตั้งแต่ 50%</span></h2>
+    <p id="fcNote"></p></div>
+  <div id="mapFc"></div>
+  <div class="scroll tbl" id="fcWin"><table class="stack" id="tWin"><caption>พยากรณ์ช่วงไหน: วันที่ตรวจล่าสุดและวันเป้าหมายของแต่ละรอบ (นับจากวันประมวลผล <span id="winRun"></span>)</caption><thead><tr><th>เครือข่าย</th><th>ตรวจล่าสุด (ค่าจริง)</th><th>ระยะห่างปกติ</th><th class="fc">รอบหน้า</th><th class="fc">2 รอบข้างหน้า</th><th class="fc">3 รอบข้างหน้า</th></tr></thead><tbody></tbody></table>
+   <p class="note" style="margin:6px 12px 10px">วันเป้าหมาย = วันตรวจล่าสุดของเครือข่าย + ระยะห่างปกติระหว่างรอบ × h ค่าเฉลี่ยใน log คือ a + ρ<sup>d</sup>(ln C<sub>ล่าสุด</sub> − a) โดย d = จำนวนวัน ÷ 14 และ ρ = <span id="winRho"></span> ยิ่งไกล ค่ายิ่งเข้าหาค่าเฉลี่ยของจุดตรวจและช่วงยิ่งกว้าง วันเป้าหมายที่ผ่านไปแล้วแปลว่าหน่วยงานยังไม่เผยแพร่รายงานรอบนั้น ค่าพยากรณ์ยังใช้ได้จนกว่าจะมีค่าจริงมาแทน</p></div>
+  <div class="filters"><span class="sub" style="font-size:14px">ตารางพยากรณ์:</span><div class="seg" id="fFc"></div></div>
+  <div class="scroll tbl"><table class="stack" id="tFc"><caption>ค่าพยากรณ์ P50 (ช่วง P10–P90) และโอกาสเกิน 0.01 มก./ล.</caption><thead><tr><th>จุดตรวจ</th><th>พื้นที่</th><th class="fc">รอบถัดไป (ยังไม่มีรายงาน)</th><th class="fc">2 รอบข้างหน้า</th><th class="fc">3 รอบข้างหน้า</th></tr></thead><tbody></tbody></table></div>
+  <p class="note">การทดสอบย้อนหลังทำกับ "รอบหน้า" เท่านั้น ค่าพยากรณ์ 2–3 รอบข้างหน้ามีช่วงกว้างขึ้นและยังไม่ได้ทดสอบย้อนหลัง ช่องที่ทำเครื่องหมาย * มีระยะพยากรณ์เกิน 120 วัน จึงมีความน่าเชื่อถือต่ำ และแผนที่จะไม่ใช้ค่านั้นระบายสีแม่น้ำ</p>
+ </div>
+</section>
+
+<!-- ============ 3) COMPARE ============ -->
+<section class="band" id="cmpmap">
+ <div class="wrap">
+  <span class="kind cmp">ค่าจริง | ค่าพยากรณ์</span>
+  <div class="head"><h2>แผนที่เปรียบเทียบ<span class="sub">ฝั่งซ้ายคือค่าที่ตรวจวัดได้จริงในวันนั้น ฝั่งขวาคือค่าที่แบบจำลองพยากรณ์ไว้ก่อนวันนั้น โดยใช้ข้อมูลก่อนวันเก็บตัวอย่างเท่านั้น</span></h2>
+    <p>ลากปุ่มกลมตรงกลางไปซ้ายหรือขวาเพื่อเทียบสองฝั่ง เลือกวันเก็บตัวอย่างจากแถบเวลา ตารางใต้แผนที่เปลี่ยนตามวันที่เลือก</p></div>
+  <div id="mapCmp"></div>
+  <div class="scroll tbl" style="margin-top:16px"><table class="stack" id="tCmp"><caption id="tCmpCap"></caption><thead><tr><th>จุดตรวจ</th><th>พื้นที่</th><th>ค่าจริง</th><th class="fc">พยากรณ์ไว้ P50</th><th class="fc">ช่วง P10–P90</th><th>ผล</th><th>ความแม่นยำทุกครั้งของจุดนี้</th></tr></thead><tbody></tbody></table></div>
+
+  <div class="head" style="margin-top:56px" id="compare"><h3 style="font-size:24px">กราฟรายจุด: ค่าจริงเทียบค่าพยากรณ์ทุกครั้ง</h3><p>เส้นทึบสีเข้ม = ค่าจริง เส้นประสีน้ำเงิน = ค่าพยากรณ์ล่วงหน้า 1 รอบ แถบฟ้า = ช่วง P10–P90 เพชรสีน้ำเงิน = พยากรณ์รอบหน้า</p></div>
+  <div class="cmp">
+    <div class="panel">
+      <div class="ctrls"><label for="cmpSel" class="sub" style="font-size:14px">จุดตรวจ</label><select id="cmpSel"></select><span class="tag" id="cmpTag"></span></div>
+      <div class="lg" aria-hidden="true">
+        <span><svg width="34" height="12"><line x1="1" x2="33" y1="6" y2="6" stroke="#0f172a" stroke-width="2"/><circle cx="17" cy="6" r="3.5" fill="#0f172a"/></svg>ค่าตรวจวัดจริง</span>
+        <span><svg width="34" height="12"><path d="M17 1.5l4 4.5-4 4.5-4-4.5z" fill="#fff" stroke="#0f172a" stroke-width="1.4"/></svg>ต่ำกว่าขีดตรวจวัด</span>
+        <span><svg width="34" height="12"><rect x="1" y="1" width="32" height="10" rx="2" fill="rgba(37,99,235,.13)"/><line x1="1" x2="33" y1="6" y2="6" stroke="#2563eb" stroke-width="2" stroke-dasharray="4 3"/></svg>ค่าพยากรณ์ P50 และ P10–P90</span>
+        <span><svg width="34" height="12"><path d="M17 0.5l5 5.5-5 5.5-5-5.5z" fill="#2563eb"/></svg>พยากรณ์รอบหน้า</span>
+        <span><svg width="34" height="12"><line x1="1" x2="33" y1="6" y2="6" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="2 3"/></svg>มาตรฐาน 0.01</span>
+      </div>
+      <div id="cmpChart"></div>
+      <div class="scroll" style="margin-top:14px"><table class="stack" id="cmpTable"><thead><tr><th>วันเก็บตัวอย่าง</th><th>ค่าจริง</th><th class="fc">พยากรณ์ P50</th><th class="fc">ช่วง P10–P90</th><th>ผลการเทียบ</th></tr></thead><tbody></tbody></table></div>
+      <button class="btn" id="cmpMore" style="margin-top:12px">แสดงทุกครั้ง</button>
+    </div>
+    <div>
+      <div class="panel" style="margin-bottom:14px"><h3 style="margin-bottom:6px">ทุกจุด ทุกครั้ง</h3><div class="sub" style="font-size:13px;margin-bottom:8px">แกนนอน = ค่าพยากรณ์ P50 แกนตั้ง = ค่าจริง (เฉพาะค่าที่ตรวจวัดได้) เส้นทแยงคือพยากรณ์ตรงพอดี</div><div id="scatter"></div></div>
+      <div id="metrics"></div>
+    </div>
+  </div>
+ </div>
+</section>
+
+<section class="band" id="provinces">
+  <div class="wrap">
+    <div class="head"><h2>จังหวัดที่ได้รับผลกระทบ<span class="sub">เรียงตามทิศน้ำ แยกสถานะจากค่าจริงล่าสุดกับค่าพยากรณ์รอบหน้า</span></h2>
+      <p>ตัวเลขสุขภาพมาจากกรมควบคุมโรค (ปีงบประมาณ 2569) ข้อมูลในบรรทัดที่มีแหล่งข่าวกำกับเป็นบริบท ไม่ได้ใช้ในการคำนวณ</p></div>
+    <div class="provs" id="provList"></div>
+  </div>
+</section>
+
+<section class="band" id="flow">
+  <div class="wrap">
+    <div class="head"><h2>แม่น้ำไหลไปไหนบ้าง<span class="sub">เส้นทางน้ำจากต้นทางถึงทะเล และค่าจริงล่าสุดของจุดตรวจบนเส้นทาง</span></h2>
+      <p>แม่น้ำกก สาย และรวก ไหลลงแม่น้ำโขงที่อำเภอเชียงแสน แม่น้ำโขงไหลเข้า สปป.ลาว แล้วกลับมาเป็นพรมแดนไทย–ลาวตั้งแต่จังหวัดเลยถึงอุบลราชธานี ก่อนไหลต่อไปกัมพูชาและเวียดนาม ส่วนแม่น้ำสาละวินไหลจากเมียนมาผ่านชายแดนแม่ฮ่องสอนกลับเข้าเมียนมาไปทะเลอันดามัน</p></div>
+    <div class="routes" id="routes"></div>
+  </div>
+</section>
+
+<section class="band" id="treatment">
+  <div class="wrap">
+    <div class="head"><h2>มีการบำบัดหรือยัง และได้ผลอย่างไร<span class="sub">มาตรการของหน่วยงาน สถานะล่าสุด และผลที่หน่วยงานรายงาน</span></h2>
+      <p>การบำบัดที่ทำอยู่จริงคือการบำบัดน้ำประปาที่โรงผลิตน้ำ ส่วนการบำบัดในแม่น้ำ เช่น ฝายดักตะกอน ยังไม่มีการก่อสร้าง แม่น้ำจึงยังมีสารหนูเกินมาตรฐานตามผลตรวจล่าสุด ผลการบำบัดน้ำประปาเป็นผลที่หน่วยงานแถลง ยังไม่พบตารางผลตรวจน้ำประปารายจุดที่เผยแพร่</p></div>
+    <div class="tgrid" id="tgrid"></div>
+  </div>
+</section>
+
+<section class="band" id="method">
+  <div class="wrap">
+    <div class="head"><h2>คำนวณอย่างไร และอัปเดตอย่างไร<span class="sub">คณิตศาสตร์ประยุกต์กับเคมีของสารหนู</span></h2>
+      <p>ใช้ข้อมูลทางการทั้งหมด ไม่มีการเก็บตัวอย่างเอง ระบบตรวจหารายงานใหม่ของ สคพ.1 และ สคพ.9 ทุก 6 ชั่วโมง ถ้าพบรายงานใหม่จะถอดตาราง ตรวจคุณภาพข้อมูล คำนวณใหม่ และเผยแพร่หน้าเว็บอัตโนมัติ ถ้าข้อมูลไม่ผ่านการตรวจจะไม่เผยแพร่</p></div>
+    <div class="grid3" id="vbox"></div>
+    <div style="display:grid;gap:12px;margin-top:20px">
+      <div class="eq">ln C<sub>t</sub> | ln C<sub>t−1</sub> ~ N( a<sub>s</sub> + ρ<sup>d</sup>(ln C<sub>t−1</sub> − a<sub>s</sub>),  σ²(1 − ρ<sup>2d</sup>) ),   d = Δt / 14 วัน</div>
+      <div class="eq">พยากรณ์ h รอบข้างหน้า:  E[ln C<sub>t+h</sub>] = a<sub>s</sub> + ρ<sup>d<sub>h</sub></sup>(ln C<sub>t</sub> − a<sub>s</sub>),   Var = σ²(1 − ρ<sup>2d<sub>h</sub></sup>)   (ยิ่งไกล ยิ่งเข้าใกล้ค่าเฉลี่ยระยะยาวของจุดนั้น และช่วงกว้างขึ้น)</div>
+      <div class="eq">ค่า "&lt;0.010" และ "≤0.010" ใช้ likelihood แบบ Tobit:  P(ln C ≤ ln 0.010) = Φ((ln 0.010 − μ)/σ)</div>
+      <div class="eq">สารหนูที่เกาะอนุภาค:  f<sub>p</sub> = K<sub>d</sub>·TSS / (1 + K<sub>d</sub>·TSS)   →   ln C = a + β·ln(ความขุ่น),  β = <span id="beta">–</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="advice">
+  <div class="wrap">
+    <div class="head"><h2>ลดความเสี่ยงได้อย่างไร<span class="sub">ข้อมูลเพื่อการเฝ้าระวัง ไม่ใช่การวินิจฉัยทางการแพทย์</span></h2>
+      <p>คำแนะนำทั่วไปตามที่หน่วยงานสาธารณสุขเผยแพร่ ถ้ามีอาการผิดปกติควรพบแพทย์</p></div>
+    <div class="adv">
+      <div class="box"><h3>เลือกแหล่งน้ำ</h3><p>ไม่ดื่มหรือใช้น้ำจากแม่น้ำโดยตรง ใช้น้ำประปาหรือน้ำที่ผ่านการตรวจแล้ว การต้มน้ำไม่ได้กำจัดสารหนู หน่วยงานในหนองคายแนะนำเครื่องกรองแบบ RO สำหรับน้ำดื่ม</p></div>
+      <div class="box"><h3>กลุ่มที่ควรระวังเป็นพิเศษ</h3><p>ผู้ทำประมงและผู้ใช้น้ำในลำน้ำเป็นประจำ เด็กเล็ก หญิงตั้งครรภ์ ผู้สูงอายุ ไม่ควรใช้น้ำแม่น้ำชงนมหรือประกอบอาหาร</p></div>
+      <div class="box"><h3>อาหารจากลำน้ำ</h3><p>เนื้อปลาบริโภคได้ แต่ควรเลี่ยงพุง เครื่องใน และไส้ปลา งดใช้น้ำแม่น้ำรดผักในช่วงที่ผลตรวจเกินมาตรฐาน และติดตามผลตรวจผักและปลาของจังหวัด</p></div>
+      <div class="box"><h3>สอบถามข้อมูล</h3><p>สายด่วนกรมควบคุมโรค 1422 การประปาส่วนภูมิภาคในพื้นที่ ผลตรวจทางการ: <a href="https://epo01.pcd.go.th/th/information/more/358">สคพ.1 เชียงใหม่</a> และ <a href="https://epo09.pcd.go.th/th/information/more/579">สคพ.9 อุดรธานี</a></p></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="toast" id="toast" role="status"><span id="toastMsg"></span><button id="toastBtn">โหลดข้อมูลใหม่</button></div>
+
+<footer>
+  <div class="wrap" style="display:grid;gap:10px">
+    <div id="disc"></div>
+    <div id="srcs"></div>
+    <div>ขอบเขตจังหวัด/อำเภอ: geoBoundaries (ODbL)<br>แนวแม่น้ำ: © OpenStreetMap contributors (ODbL)<br>ข้อมูลสุขภาพ: กรมควบคุมโรค ผ่าน Thai PBS<br>มาตรการบำบัด: แถลงของ กปภ. ทส. อว. และจังหวัด ผ่านสื่อ (ลิงก์อยู่ในแต่ละการ์ด)</div>
+    <div>โครงงานคณิตศาสตร์ประยุกต์<br>แถบเมนูได้แรงบันดาลใจจาก Nimbus UI Liquid Navbar การ์ดตัวเลขจาก Peak Chart (Louis Studios) และพื้นหลังหัวเรื่องจาก 21st.dev Shader Builder</div>
+  </div>
+</footer>
+
+<script type="x-shader/x-fragment" id="halftone-fs">
+// "Halftone" — made with the 21st.dev Shader Builder
+// Packed WebGL1 uniforms (the shader exposes readable u_* aliases as macros):
+//   u_colors[8] (first 4 used)
+//   vec3(0.043, 0.063, 0.149)
+//   vec3(0.239, 0.275, 0.910)
+//   vec3(0.694, 0.549, 1.000)
+//   vec3(1.000, 0.839, 0.906)
+//   u_scene = vec4(canvas width, canvas height, seconds * 1.43, 4.0)
+//   u_shape = vec4(1.48, 0.88, 0.50, 0.00)
+//   u_surface = vec4(2.40, 0.91, 0.00, 1.00)
+//   u_finish = vec4(0.00, 0.00, 0.000, 0.06)
+//   u_transform = vec4(2926.0, 0.00, 0.00, 0.0)
+//   u_space = vec4(0.00, 0.00, pointer x, pointer y)
+//   u_cursor = vec4(presence, 2.0, 0.65, 0.46)
+
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+
+uniform vec3 u_colors[8];
+// Seven packed vectors + eight colour vectors = 15 fragment uniform vectors,
+// one below WebGL1's guaranteed minimum. Macros preserve the public u_* API.
+uniform vec4 u_scene;      // resolution.xy, time, colour count
+uniform vec4 u_shape;      // scale, intensity, paramA, warp
+uniform vec4 u_surface;    // detail, contrast, brightness, saturation
+uniform vec4 u_finish;     // hue, vignette, blur, grain
+uniform vec4 u_transform;  // seed, rotation, drift, OKLab toggle
+uniform vec4 u_space;      // offset.xy, pointer.xy
+uniform vec4 u_cursor;
+
+#define u_resolution u_scene.xy
+#define u_time u_scene.z
+#define u_colorCount u_scene.w
+#define u_scale u_shape.x
+#define u_intensity u_shape.y
+#define u_paramA u_shape.z
+#define u_warp u_shape.w
+#define u_detail u_surface.x
+#define u_contrast u_surface.y
+#define u_brightness u_surface.z
+#define u_saturation u_surface.w
+#define u_hue u_finish.x
+#define u_vignette u_finish.y
+#define u_blur u_finish.z
+#define u_grain u_finish.w
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+#define u_seed u_transform.x
+#else
+// Keep hash inputs inside mediump's guaranteed ±2^14 range.
+#define u_seed mod(u_transform.x, 31.0)
+#endif
+#define u_rotate u_transform.y
+#define u_drift u_transform.z
+#define u_oklab u_transform.w
+#define u_offset u_space.xy
+#define u_mouse u_space.zw
+#define u_cursorPresence u_cursor.x
+#define u_cursorEffect u_cursor.y
+#define u_cursorStrength u_cursor.z
+#define u_cursorRadius u_cursor.w
+
+float hash21(vec2 p) {
+#ifndef GL_FRAGMENT_PRECISION_HIGH
+  p = mod(p, 31.0);
+#endif
+  p = fract(p * vec2(234.34, 435.345));
+  p += dot(p, p + 34.23);
+  return fract(p.x * p.y);
+}
+
+// Even, un-structured white noise for film grain (Dave Hoskins hash12). The
+// multiply hash above is fine for value noise but shows a faint axis-aligned
+// mesh at integer fragment coords, which reads as a net over flat areas.
+float grainHash(vec2 p) {
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
+
+vec2 hash22(vec2 p) {
+#ifndef GL_FRAGMENT_PRECISION_HIGH
+  p = mod(p, 31.0);
+#endif
+  float n = sin(dot(p, vec2(41.0, 289.0)));
+  return fract(vec2(15731.743, 7892.321) * n);
+}
+
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(hash21(i), hash21(i + vec2(1.0, 0.0)), u.x),
+    mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), u.x),
+    u.y);
+}
+
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i < 5; i++) {
+    v += a * noise(p);
+    p = p * 2.03 + vec2(17.0, 9.2);
+    a *= 0.5;
+  }
+  return v;
+}
+
+// --- OKLab colour mixing (perceptual), gated by u_oklab -----------------------
+vec3 srgbToLinear(vec3 c) {
+  return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)),
+    step(0.04045, c));
+}
+vec3 linearToSrgb(vec3 c) {
+  // max() guards the sRGB branch: out-of-gamut OKLab interpolations can send a
+  // channel negative, and pow(negative, …) is NaN which mix()/step() would
+  // then propagate. The linear branch clips such channels to 0 downstream.
+  return mix(c * 12.92, 1.055 * pow(max(c, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055,
+    step(0.0031308, c));
+}
+vec3 linToOklab(vec3 c) {
+  float l = 0.4122214708 * c.r + 0.5363325363 * c.g + 0.0514459929 * c.b;
+  float m = 0.2119034982 * c.r + 0.6806995451 * c.g + 0.1073969566 * c.b;
+  float s = 0.0883024619 * c.r + 0.2817188376 * c.g + 0.6299787005 * c.b;
+  l = pow(max(l, 0.0), 1.0 / 3.0);
+  m = pow(max(m, 0.0), 1.0 / 3.0);
+  s = pow(max(s, 0.0), 1.0 / 3.0);
+  return vec3(
+    0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s);
+}
+vec3 oklabToLin(vec3 c) {
+  float l = c.x + 0.3963377774 * c.y + 0.2158037573 * c.z;
+  float m = c.x - 0.1055613458 * c.y - 0.0638541728 * c.z;
+  float s = c.x - 0.0894841775 * c.y - 1.2914855480 * c.z;
+  l = l * l * l; m = m * m * m; s = s * s * s;
+  return vec3(
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s);
+}
+vec3 mixColour(vec3 a, vec3 b, float t) {
+  if (u_oklab > 0.5) {
+    vec3 la = linToOklab(srgbToLinear(a));
+    vec3 lb = linToOklab(srgbToLinear(b));
+    return clamp(linearToSrgb(oklabToLin(mix(la, lb, t))), 0.0, 1.0);
+  }
+  return mix(a, b, t);
+}
+
+// Mix through the recipe colours; x is clamped to 0..1. WebGL1 forbids
+// dynamic uniform indexing in fragment shaders, hence the constant loop.
+vec3 palette(float x) {
+  float n = max(u_colorCount - 1.0, 1.0);
+  float f = clamp(x, 0.0, 1.0) * n;
+  vec3 col = u_colors[0];
+  for (int i = 0; i < 7; i++) {
+    if (float(i) < n)
+      col = mixColour(col, u_colors[i + 1],
+        smoothstep(0.0, 1.0, clamp(f - float(i), 0.0, 1.0)));
+  }
+  return col;
+}
+
+vec3 hueRotate(vec3 col, float a) {
+  const mat3 toYIQ = mat3(0.299, 0.596, 0.211,
+                          0.587, -0.274, -0.523,
+                          0.114, -0.322, 0.312);
+  const mat3 toRGB = mat3(1.0, 1.0, 1.0,
+                          0.956, -0.272, -1.106,
+                          0.621, -0.647, 1.703);
+  vec3 yiq = toYIQ * col;
+  float ca = cos(a), sa = sin(a);
+  yiq = vec3(yiq.x, yiq.y * ca - yiq.z * sa, yiq.y * sa + yiq.z * ca);
+  return toRGB * yiq;
+}
+
+vec3 shade(vec2 uv, vec2 p, float t) {
+  float cells = 18.0 + u_intensity * 30.0;
+  vec2 f = fract(p * cells) - 0.5;
+  float field = 0.5 + 0.5 * sin(p.x * 3.0 + t + u_seed) * sin(p.y * 2.4 - t * 0.7);
+  float r = (0.06 + u_paramA * 0.34) + field * 0.2;
+  float dotMask = 1.0 - smoothstep(r - 0.08, r, length(f));
+  return mix(u_colors[0], palette(field), dotMask);
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+  vec2 screenUv = uv;
+  vec2 p = (gl_FragCoord.xy - 0.5 * u_resolution.xy)
+    / min(u_resolution.x, u_resolution.y);
+  float cursorMask = 0.0;
+
+  // Cursor modes 1–3 are local distortions. Push shifts the same screen-space
+  // coordinates before field transforms, so Zoom/Rotate don't change its feel.
+  if (u_cursorPresence > 0.001) {
+    // u_mouse is normalized to -1..1 in canvas space. Convert it to the same
+    // aspect-corrected screen space as p so effects stay under the cursor.
+    vec2 cursor = (0.5 * u_mouse * u_resolution.xy)
+      / min(u_resolution.x, u_resolution.y);
+    vec2 cursorDelta = p - cursor;
+    if (u_cursorEffect < 0.5) {
+      p += cursor * u_cursorPresence * u_cursorStrength * 0.55;
+    } else {
+      float cursorDistance = length(cursorDelta);
+      vec2 cursorDirection = cursorDelta / max(cursorDistance, 0.0001);
+      cursorMask = u_cursorPresence
+        * (1.0 - smoothstep(0.0, u_cursorRadius, cursorDistance));
+      if (u_cursorEffect < 1.5) {
+        p -= cursorDirection * cursorMask * u_cursorStrength * 0.24;
+      } else if (u_cursorEffect < 2.5) {
+        float cursorAngle = cursorMask * u_cursorStrength * 2.2;
+        float cc = cos(cursorAngle), cs = sin(cursorAngle);
+        p = cursor + mat2(cc, -cs, cs, cc) * cursorDelta;
+      } else if (u_cursorEffect < 3.5) {
+        float ripple = sin(
+          cursorDistance / max(u_cursorRadius, 0.001) * 18.0 - u_time * 5.0);
+        p -= cursorDirection * ripple * cursorMask * u_cursorStrength * 0.07;
+      }
+    }
+  }
+
+  // Keep presets that read uv (rather than p) in the same warped space.
+  uv = p * min(u_resolution.x, u_resolution.y) / u_resolution.xy + 0.5;
+  p *= u_scale;
+  // Field transform: rotate, pan, pointer push, slow drift.
+  if (abs(u_rotate) > 0.0001) {
+    float cr = cos(u_rotate), sr = sin(u_rotate);
+    p = mat2(cr, -sr, sr, cr) * p;
+  }
+  p += u_offset;
+  if (u_drift > 0.0001)
+    p += u_drift * vec2(sin(u_time * 0.31), cos(u_time * 0.23));
+  // Organic domain warp.
+  if (u_warp > 0.0) {
+    p += u_warp * (vec2(
+      fbm(p * u_detail + u_seed),
+      fbm(p * u_detail + vec2(5.2, 1.3))) - 0.5);
+  }
+  // Shade, with an optional soft 5-tap blur.
+  vec3 col;
+  if (u_blur > 0.0) {
+    float e = u_blur;
+    float pe = e * u_scale;
+    vec2 uvE = vec2(e) * min(u_resolution.x, u_resolution.y) / u_resolution.xy;
+    col  = shade(uv, p, u_time) * 0.36;
+    col += shade(uv + vec2(uvE.x, 0.0), p + vec2(pe, 0.0), u_time) * 0.16;
+    col += shade(uv - vec2(uvE.x, 0.0), p - vec2(pe, 0.0), u_time) * 0.16;
+    col += shade(uv + vec2(0.0, uvE.y), p + vec2(0.0, pe), u_time) * 0.16;
+    col += shade(uv - vec2(0.0, uvE.y), p - vec2(0.0, pe), u_time) * 0.16;
+  } else {
+    col = shade(uv, p, u_time);
+  }
+  // Post: contrast, saturation, hue, brightness, vignette, grain.
+  if (abs(u_contrast - 1.0) > 0.0001)
+    col = (col - 0.5) * u_contrast + 0.5;
+  if (abs(u_saturation - 1.0) > 0.0001) {
+    float luma = dot(col, vec3(0.299, 0.587, 0.114));
+    col = mix(vec3(luma), col, u_saturation);
+  }
+  if (abs(u_hue) > 0.0001)
+    col = hueRotate(col, u_hue);
+  if (abs(u_brightness) > 0.0001)
+    col += u_brightness;
+  if (u_vignette > 0.0001) {
+    float vd = length(screenUv - 0.5) * 1.41421356;
+    col *= 1.0 - u_vignette * smoothstep(0.35, 1.0, vd);
+  }
+  if (u_cursorPresence > 0.001 && u_cursorEffect > 3.5)
+    col += (vec3(0.18) + col * 0.12) * cursorMask * u_cursorStrength;
+  if (u_grain > 0.0001)
+    col += (grainHash(
+      gl_FragCoord.xy + vec2(u_seed * 17.0, u_seed * 31.0)) - 0.5) * u_grain;
+  gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+}
+</script>
+<script>
+{
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const STD = 0.01;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const NET_TH = {kok_basin:'กก–สาย–รวก–โขง', salween:'สาละวิน', mekong_ne:'โขง ภาคอีสาน'};
+const NET_COL = {kok_basin:'#0f172a', salween:'#7c3aed', mekong_ne:'#0891b2'};
+const WINDOW = {kok_basin:40, salween:75, mekong_ne:100};
+const VIEWS = {basin:[99.18,19.78,100.58,20.66], salween:[97.3,17.65,98.35,19.3], mekong:[99.9,14.9,105.9,20.75], th:[97.2,5.4,107.2,20.9]};
+const VIEW_TH = {basin:'กก–สาย–โขง เชียงราย', salween:'สาละวิน แม่ฮ่องสอน', mekong:'โขง ถึงอีสาน', th:'ทั้งประเทศ'};
+const thDate = (iso, o) => iso ? new Date(iso + 'T00:00:00').toLocaleDateString('th-TH', o || {day:'numeric',month:'short',year:'numeric'}) : '';
+const fmt = c => c == null ? '–' : c.toFixed(3);
+const days = (a, b) => (new Date(a) - new Date(b)) / 864e5;
+const STOPS = [[-2.35,[13,148,136]],[-2,[202,138,4]],[-1.52,[234,88,12]],[-1,[220,38,38]],[-0.52,[190,18,60]]];
+function col(c){ if(c == null) return [168,176,189]; const x = Math.log10(Math.max(c, 1e-4));
+  if(x <= STOPS[0][0]) return STOPS[0][1];
+  for(let i=1;i<STOPS.length;i++){ if(x <= STOPS[i][0]){ const [a,ca]=STOPS[i-1],[b,cb]=STOPS[i]; const t=(x-a)/(b-a); return ca.map((v,k)=>Math.round(v+(cb[k]-v)*t)); } }
+  return STOPS[STOPS.length-1][1]; }
+const rgb = (c, a=1) => { const v = col(c); return `rgba(${v[0]},${v[1]},${v[2]},${a})`; };
+
+let LOC, MAPS = {}, G, H, F, M, OBS, BT, CTX, ST = {}, OBS_DATES = [], BT_DATES = [], LAST_T;
+Promise.all(['geo','history','forecast_latest','meta','observations','backtest','context','locations'].map(n => fetch('data/' + n + '.json', {cache:'no-cache'}).then(r => { if(!r.ok) throw new Error(n); return r.json(); })))
+  .then(([g,h,f,m,o,b,c,l]) => { G=g; H=h; F=f; M=m; OBS=o; BT=b; CTX=c; LOC=l; init(); })
+  .catch(e => { document.querySelector('#actual').insertAdjacentHTML('beforeend', `<p class="err" style="display:block">โหลดข้อมูลไม่สำเร็จ (${esc(e.message)}) ถ้าเปิดไฟล์จากเครื่อง ให้เปิดผ่าน Live Server ใน VS Code</p>`); console.error(e); });
+
+/* ---------- data helpers ---------- */
+const fcOf = sid => F.segment_forecast.find(x => x.station_id === sid);
+const isEx = e => e && e.censor === 'none' && e.value > STD;
+const cOf = e => e.censor === 'none' ? e.value : 0.007;
+function obsAt(sid, t){ const list = H[sid] || [], o = ST[sid] || {}, w = WINDOW[o.network] || 40; let e = null;
+  for(const x of list){ if(x.t_mid <= t) e = x; else break; } return e && days(t, e.t_mid) <= w ? e : null; }
+const lastObs = sid => (H[sid] || []).slice(-1)[0];
+function inPoly(x, y, r){ let c=false; for(let i=0,j=r.length-1;i<r.length;j=i++){ const [xi,yi]=r[i],[xj,yj]=r[j]; if(((yi>y)!==(yj>y)) && x < (xj-xi)*(y-yi)/(yj-yi)+xi) c=!c; } return c; }
+function centroid(p){ const r = p.rings.reduce((a,b)=>b.length>a.length?b:a); let sx=0,sy=0; for(const [x,y] of r){sx+=x;sy+=y;} return [sx/r.length, sy/r.length]; }
+function placeOf(lon, lat){ const pv = G.provinces.find(q => q.rings.some(r => inPoly(lon, lat, r))); const am = G.amphoe.find(q => q.rings.some(r => inPoly(lon, lat, r)));
+  return pv ? (am ? 'อ.' + am.name_th + ' ' : '') + 'จ.' + pv.name_th : 'นอกประเทศไทย'; }
+
+function init(){
+  for(const o of OBS) ST[o.station_id] = o;
+  OBS_DATES = [...new Set(Object.values(H).flat().map(e => e.t_mid))].sort(); LAST_T = OBS_DATES[OBS_DATES.length-1];
+  BT_DATES = [...new Set(Object.values(BT).flat().map(b => b.t))].sort();
+  const N = M.networks;
+  $('#meta').innerHTML = `<span class="tag live"><i></i>อัปเดตอัตโนมัติเมื่อมีรายงานใหม่ (คำนวณล่าสุด ${esc(thDate(M.generated_at.slice(0,10)))})</span>` +
+    Object.entries(N).map(([k,n]) => `<span class="tag">${esc(NET_TH[k])}: ครั้งที่ ${n.latest_round} (${esc(thDate(n.latest_end))})</span>`).join('');
+  $('#disc').textContent = M.disclaimer;
+  { const ex = OBS.filter(o => isEx(obsAt(o.station_id, LAST_T))), provs = [...new Set(ex.map(o => o.province))];
+    $('#finding').innerHTML = `ผลตรวจล่าสุดของรัฐพบสารหนูเกินมาตรฐานใน <b>${provs.length} จังหวัด ${ex.length} จุดตรวจ</b> คือ ${esc(provs.join(' '))}<br>น้ำจากลุ่มน้ำกกไหลลงแม่น้ำโขงต่อไปถึงอุบลราชธานี ซึ่งยังไม่มีผลตรวจ<small>ข้อมูลจาก กรมควบคุมมลพิษ สคพ.1 และ สคพ.9 ถึง ${esc(thDate(LAST_T))} แผนที่ด้านล่างแยกค่าจริง ค่าพยากรณ์ และการเปรียบเทียบ</small>`; }
+  $('#srcs').textContent = 'ข้อมูลคุณภาพน้ำ: ' + Object.values(N).map(n => n.source).join(', ');
+  for(const p of G.provinces){ p.st = OBS.filter(o => o.province === p.name_th).map(o => o.station_id); p.ctx = CTX.affected_areas.provinces.find(x => x.name === p.name); }
+  for(const a of G.amphoe){ a.st = OBS.filter(o => o.lat != null && o.network === 'kok_basin' && a.rings.some(r => inPoly(o.lon, o.lat, r))).map(o => o.station_id); }
+  for(const rv of G.rivers) prepRiver(rv);
+  for(const tr of G.thai_rivers || []) tr.bb = bbox(tr.pts);
+  shader(); hatchCanvas();
+  MAPS.obs = new RiverMap($('#mapObs'), 'obs'); MAPS.fc = new RiverMap($('#mapFc'), 'fc'); MAPS.cmp = new RiverMap($('#mapCmp'), 'cmp');
+  $('#fcNote').textContent = 'วันเป้าหมายรอบหน้า: ' + Object.entries(N).map(([k,n]) => `${NET_TH[k]} ${thDate(n.target_date)}`).join(', ') + ' (วันเก็บล่าสุดของเครือข่ายบวกช่วงห่างปกติ ถ้าวันเป้าหมายผ่านมาแล้วแต่ยังไม่มีรายงาน แปลว่าเป็นค่าประมาณของรอบที่ยังไม่เผยแพร่)';
+  tableObs('all'); tableFc('all'); tableWin(); filters(); myArea();
+  cards(); provinces(); compare(); routes(); treatment(); method(); nav(); poll();
+}
+function bbox(pts){ return pts.reduce((m,[x,y]) => [Math.min(m[0],x),Math.min(m[1],y),Math.max(m[2],x),Math.max(m[3],y)], [999,999,-999,-999]); }
+function prepRiver(rv){ const p = rv.pts, km = [0];
+  for(let i=1;i<p.length;i++){ const dx=(p[i][0]-p[i-1][0])*111*Math.cos(p[i][1]*Math.PI/180), dy=(p[i][1]-p[i-1][1])*111; km.push(km[i-1]+Math.hypot(dx,dy)); }
+  rv.km = km; rv.len = km[km.length-1]; rv.bb = bbox(p);
+  rv.anc = Object.entries(rv.anchors).map(([s,i]) => ({s, i})).sort((a,b) => a.i - b.i); }
+const GAP_KM = 150, TAIL_KM = 30, HEAD_KM = 15;
+function profileOf(rv, vf){
+  const a = rv.anc.map(x => { const v = vf(x.s); if(!v || v.low) return null; return {i:x.i, l:Math.log(v.c)}; }).filter(Boolean);
+  const out = new Array(rv.pts.length).fill(null); if(!a.length) return out; const km = rv.km;
+  for(let i=0;i<out.length;i++){
+    if(i < a[0].i){ out[i] = km[a[0].i] - km[i] <= HEAD_KM ? Math.exp(a[0].l) : null; continue; }
+    if(i >= a[a.length-1].i){ out[i] = km[i] - km[a[a.length-1].i] <= TAIL_KM ? Math.exp(a[a.length-1].l) : null; continue; }
+    let k = 0; while(a[k+1].i < i) k++;
+    const span = km[a[k+1].i] - km[a[k].i];
+    if(span > GAP_KM){ const d0 = km[i] - km[a[k].i], d1 = km[a[k+1].i] - km[i]; out[i] = d0 <= TAIL_KM ? Math.exp(a[k].l) : d1 <= HEAD_KM ? Math.exp(a[k+1].l) : null; continue; }
+    const t = (km[i] - km[a[k].i]) / (span || 1); out[i] = Math.exp(a[k].l + (a[k+1].l - a[k].l) * t); }
+  return out; }
+const concAt = (pr, i) => { const a = pr[Math.floor(i)], b = pr[Math.min(pr.length-1, Math.ceil(i))]; return a == null ? b : b == null ? a : a + (b-a)*(i%1); };
+let HATCH = null;
+function hatchCanvas(){ const c = document.createElement('canvas'); c.width = c.height = 8; const x = c.getContext('2d'); x.strokeStyle = 'rgba(100,116,139,.45)'; x.lineWidth = 1.2; x.beginPath(); x.moveTo(0,8); x.lineTo(8,0); x.stroke(); HATCH = c; }
+
+/* =====================================================================
+   RiverMap: one interactive map (mode obs | fc | cmp) with pan, zoom, hover
+   ===================================================================== */
+const SPEED = {kok:1, fang:.8, sai:.7, ruak:.8, mekong:1.5, mekong_lower:1.6, salween:1.3};
+class RiverMap {
+  constructor(root, mode){
+    this.root = root; this.mode = mode; this.view = mode === 'cmp' ? 'basin' : 'basin'; this.h = 1; this.split = .5; this.sel = null; this.active = false;
+    this.ti = mode === 'cmp' ? BT_DATES.length - 1 : OBS_DATES.length - 1;
+    const isFc = mode === 'fc';
+    root.innerHTML = `<div class="console ${isFc ? 'fcm' : ''}"><div class="stage">
+      <canvas class="cb" aria-hidden="true"></canvas><canvas class="cf" role="img" style="touch-action:pan-y" aria-label="${mode === 'obs' ? 'แผนที่ค่าตรวจวัดจริง' : mode === 'fc' ? 'แผนที่ค่าพยากรณ์' : 'แผนที่เปรียบเทียบค่าจริงกับค่าพยากรณ์'} ลากเพื่อเลื่อน ซูมด้วยปุ่มหรือ Ctrl และลูกกลิ้ง"></canvas>
+      <div class="ctl tl"><div class="seg vseg" role="group" aria-label="มุมมองแผนที่">${Object.entries(VIEW_TH).map(([k,t]) => `<button data-v="${k}" aria-pressed="${k === this.view}">${t}</button>`).join('')}</div></div>
+      <div class="ctl tr"><div class="legend">${this.legend()}</div></div>
+      <div class="zoom"><button data-z="1" aria-label="ซูมเข้า">+</button><button data-z="-1" aria-label="ซูมออก">−</button><button data-z="0" aria-label="กลับมุมมองเริ่มต้น" style="font-size:15px">⟲</button></div>
+      ${mode === 'cmp' ? `<div class="swipe"><div class="lab l">ค่าจริง</div><div class="lab r">พยากรณ์ไว้ล่วงหน้า</div><div class="knob" role="slider" tabindex="0" aria-label="เลื่อนเส้นแบ่งค่าจริงกับค่าพยากรณ์" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><svg width="20" height="14" viewBox="0 0 20 14"><path d="M7 1L1 7l6 6M13 1l6 6-6 6" fill="none" stroke="#0f172a" stroke-width="2"/></svg></div></div>` : ''}
+      <div class="card"></div><div class="tip"></div><div class="hint">กด Ctrl หรือ ⌘ ค้างไว้แล้วเลื่อนลูกกลิ้งเพื่อซูม หรือคลิกแผนที่ก่อน</div>
+    </div>
+    <div class="time">${mode === 'fc'
+      ? `<span class="sub" style="font-size:13px">ล่วงหน้า</span><div class="seg hzseg" role="group" aria-label="ระยะพยากรณ์">${[1,2,3].map(h => `<button data-h="${h}" aria-pressed="${h === 1}">${h === 1 ? 'รอบหน้า' : h + ' รอบ'}</button>`).join('')}</div><div class="tlabel"></div>`
+      : `<button class="play" aria-label="เล่นย้อนดูทุกช่วงเวลา"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9-5.5z" fill="currentColor"/></svg></button><input type="range" min="0" max="${(mode === 'cmp' ? BT_DATES : OBS_DATES).length - 1}" value="${this.ti}" step="1" aria-label="เลือกวันเก็บตัวอย่าง"><div class="tlabel"></div>`}</div></div>`;
+    const q = s => root.querySelector(s);
+    this.cv = q('.cb'); this.fv = q('.cf'); this.b = this.cv.getContext('2d'); this.f = this.fv.getContext('2d'); this.stage = q('.stage');
+    this.tip = q('.tip'); this.card = q('.card'); this.hint = q('.hint'); this.lab = q('.tlabel');
+    this.cam = {cx:0, cy:0, k:1, cos:1}; this.parts = []; this.vis = false; this.raf = 0; this.camT = null;
+    root.querySelectorAll('.vseg button').forEach(b => b.onclick = () => this.setView(b.dataset.v));
+    root.querySelectorAll('.zoom button').forEach(b => b.onclick = () => +b.dataset.z ? this.zoomBy(+b.dataset.z > 0 ? 1.6 : 1/1.6, this.W/2, this.Hh/2, true) : this.setView(this.view, true));
+    if(mode === 'fc') root.querySelectorAll('.hzseg button').forEach(b => b.onclick = () => { this.h = +b.dataset.h; root.querySelectorAll('.hzseg button').forEach(x => x.setAttribute('aria-pressed', x === b)); this.refresh(); });
+    else { const rg = q('input[type=range]'); rg.oninput = e => { this.stop(); this.ti = +e.target.value; this.refresh(); }; this.rg = rg; this.play = q('.play'); this.play.onclick = () => this.timer ? this.stop() : this.start(); }
+    if(mode === 'cmp') this.swipe(q('.swipe'), q('.knob'));
+    this.events();
+    new ResizeObserver(() => this.size()).observe(this.stage);
+    new IntersectionObserver(([e]) => { this.vis = e.isIntersecting; if(this.vis) this.loop(); }).observe(root);
+    document.addEventListener('visibilitychange', () => { if(!document.hidden) this.loop(); });
+    this.size(); this.refresh(); this.spawnAll();
+  }
+  legend(){ const m = this.mode;
+    return `<div>${m === 'fc' ? 'ค่าพยากรณ์ P50' : m === 'cmp' ? 'สารหนู ซ้าย = จริง ขวา = พยากรณ์' : 'ค่าตรวจวัดจริง'} (มก./ล.)</div><div class="ramp"></div><div class="ramp-l"><span>&lt;0.01</span><span>0.03</span><span>0.1</span><span>0.3</span></div>
+      <div class="key"><i style="background:${m === 'fc' ? 'rgba(37,99,235,.18);border:1px solid #2563eb' : 'rgba(220,38,38,.18);border:1px solid #dc2626'}"></i>${m === 'fc' ? 'โอกาสเกินมาตรฐาน ≥ 50%' : 'พื้นที่สีแดง: จุดตรวจเกินมาตรฐาน'}</div>
+      <div class="key"><i style="background:rgba(234,88,12,.1);border:1px solid #ea580c"></i>${m === 'fc' ? 'โอกาสเกิน 25–50%' : 'เฝ้าระวัง: เคยเกินใน 3 ครั้งก่อน'}</div>
+      <div class="key"><i style="border:1.5px dashed #dc2626"></i>จังหวัดเฝ้าระวังของกรมควบคุมโรค</div>
+      <div class="key"><i style="background:repeating-linear-gradient(135deg,#cbd5e1 0 2px,transparent 2px 5px);border:1px solid #94a3b8"></i>ปลายน้ำ ยังไม่มีผลตรวจ</div>
+      <div class="key"><i style="background:#a8b0bd;height:3px"></i>ไม่มีจุดตรวจใกล้ช่วงนี้</div>
+      <div class="key"><i style="background:#93c5fd;height:3px"></i>แม่น้ำสายหลักอื่นของไทย</div>`; }
+  get t(){ return this.mode === 'cmp' ? BT_DATES[this.ti] : OBS_DATES[this.ti]; }
+  /* value of a station for this map; side L/R for the compare map */
+  val(sid, side){
+    if(this.mode === 'obs' || (this.mode === 'cmp' && side === 'L')){
+      const e = this.mode === 'obs' ? obsAt(sid, this.t) : (H[sid] || []).find(x => x.t_mid === this.t);
+      return e ? {c:cOf(e), txt:e.value_reported, ex:isEx(e), e, kind:'obs'} : null; }
+    if(this.mode === 'fc'){ const f = fcOf(sid), hz = f && f.horizons && f.horizons[this.h-1]; return hz ? {c:hz.p50, txt:fmt(hz.p50), p:hz.prob_exceed, hz, low:hz.reliability !== 'normal', kind:'fc'} : null; }
+    const b = (BT[sid] || []).find(x => x.t === this.t); return b ? {c:b.p50, txt:fmt(b.p50), p:b.prob_exceed, b, kind:'fc'} : null; }
+  status(ids, side){ ids = ids.filter(s => H[s]); if(!ids.length) return 'none';
+    const vs = ids.map(s => this.val(s, side)).filter(v => v && !v.low); if(!vs.length) return 'none';
+    if(vs[0].kind === 'fc'){ const p = Math.max(...vs.map(v => v.p)); return p >= .5 ? 'red' : p >= .25 ? 'watch' : 'ok'; }
+    if(vs.some(v => v.ex)) return 'red';
+    if(this.mode === 'obs' && ids.some(s => { const e = obsAt(s, this.t); if(!e) return false; const l = H[s], i = l.indexOf(e); return l.slice(Math.max(0,i-3), i).some(isEx); })) return 'watch';
+    return 'ok'; }
+  refresh(){
+    const sides = this.mode === 'cmp' ? ['L','R'] : ['M'];
+    this.prof = {}; for(const sd of sides){ this.prof[sd] = {}; for(const rv of G.rivers) this.prof[sd][rv.id] = profileOf(rv, s => this.val(s, sd)); }
+    this.pst = {}; this.ast = {}; for(const sd of sides){ this.pst[sd] = G.provinces.map(p => this.status(p.st, sd)); this.ast[sd] = G.amphoe.map(a => this.status(a.st, sd)); }
+    if(this.mode === 'fc'){ const tg = [...new Set(F.segment_forecast.map(f => f.horizons[this.h-1].target_date))].sort(); this.lab.innerHTML = `<b class="fc">ค่าพยากรณ์ ${this.h === 1 ? 'รอบหน้า' : this.h + ' รอบข้างหน้า'}</b><span>เป้าหมาย ${esc(thDate(tg[0]))} ถึง ${esc(thDate(tg[tg.length-1]))}</span>`; }
+    else { this.rg.value = this.ti; const nets = [...new Set(Object.values(H).flat().filter(e => e.t_mid === this.t).map(e => NET_TH[e.network]))];
+      this.lab.innerHTML = this.mode === 'cmp' ? `<b>${esc(thDate(this.t))}</b><span>ค่าจริงเทียบค่าที่พยากรณ์ไว้ก่อนวันนี้</span>` : `<b>${esc(thDate(this.t))}</b><span>เก็บตัวอย่าง: ${esc(nets.join(', '))}</span>`;
+      if(this.mode === 'cmp') tableCmp(this.t); }
+    this.drawBase(); this.showCard(); }
+  start(){ const L = (this.mode === 'cmp' ? BT_DATES : OBS_DATES).length; this.timer = setInterval(() => { this.ti = (this.ti + 1) % L; this.refresh(); }, 900); this.play.querySelector('path').setAttribute('d','M3 2h3v10H3zM8 2h3v10H8z'); }
+  stop(){ if(!this.timer) return; clearInterval(this.timer); this.timer = 0; this.play.querySelector('path').setAttribute('d','M3 1.5v11l9-5.5z'); }
+
+  /* ---------- camera ---------- */
+  fit(v){ const [x0,y0,x1,y1] = VIEWS[v]; const cos = Math.cos((y0+y1)/2*Math.PI/180); const pad = this.W < 600 ? 0.9 : 0.84;
+    const k = Math.min(this.W*pad/((x1-x0)*cos), (this.Hh-80)*pad/(y1-y0)); return {cx:(x0+x1)/2, cy:(y0+y1)/2 - 24/k, k, cos}; }
+  P(lon, lat){ const c = this.cam; return [(lon - c.cx) * c.k * c.cos + this.W/2, (c.cy - lat) * c.k + this.Hh/2]; }
+  unP(x, y){ const c = this.cam; return [(x - this.W/2)/(c.k*c.cos) + c.cx, c.cy - (y - this.Hh/2)/c.k]; }
+  size(){ const r = this.cv.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2); this.W = r.width; this.Hh = r.height; if(!this.W) return;
+    for(const c of [this.cv, this.fv]){ c.width = Math.round(this.W*d); c.height = Math.round(this.Hh*d); }
+    this.b.setTransform(d,0,0,d,0,0); this.f.setTransform(d,0,0,d,0,0); this.cam = this.fit(this.view); this.kmin = this.fit('th').k * .7; this.redraw(); }
+  redraw(){ this.drawBase(); this.f.clearRect(0,0,this.W,this.Hh); for(const p of this.parts) p.prev = null; this.placeSwipe(); }
+  setView(v, force){ if(v === this.view && !force) return; this.view = v; this.root.querySelectorAll('.vseg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); this.animTo(this.fit(v)); }
+  animTo(to){ const from = {...this.cam}, t0 = performance.now();
+    this.camT = now => { const t = Math.min(1, (now - t0) / (reduce ? 1 : 700)), e = t<.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+      this.cam = {cx: from.cx + (to.cx-from.cx)*e, cy: from.cy + (to.cy-from.cy)*e, k: Math.exp(Math.log(from.k) + (Math.log(to.k) - Math.log(from.k))*e), cos: from.cos + (to.cos-from.cos)*e};
+      this.redraw(); if(t >= 1) this.camT = null; };
+    if(reduce || !this.vis){ this.camT(performance.now() + 1e4); } else this.loop(); }
+  zoomBy(f, x, y, anim){ const [lon, lat] = this.unP(x, y), k = Math.max(this.kmin, Math.min(30000, this.cam.k * f));
+    const to = {k, cos:this.cam.cos, cx: lon - (x - this.W/2)/(k*this.cam.cos), cy: lat + (y - this.Hh/2)/k};
+    if(anim) this.animTo(to); else { this.cam = to; this.redraw(); } }
+  events(){
+    const fv = this.fv, ptr = new Map(); let drag = null;
+    fv.addEventListener('wheel', e => { if(!(e.ctrlKey || e.metaKey || this.active)){ this.flash(); return; } e.preventDefault(); this.zoomBy(Math.exp(-e.deltaY * 0.0018), e.offsetX, e.offsetY); }, {passive:false});
+    fv.addEventListener('dblclick', e => this.zoomBy(2, e.offsetX, e.offsetY, true));
+    fv.addEventListener('pointerdown', e => { this.active = true; ptr.set(e.pointerId, [e.offsetX, e.offsetY]); fv.setPointerCapture(e.pointerId);
+      drag = {cam:{...this.cam}, pts:new Map([...ptr].map(([k,v]) => [k,[...v]])), moved:false, x:e.offsetX, y:e.offsetY}; });
+    fv.addEventListener('pointermove', e => {
+      if(ptr.has(e.pointerId) && drag){ ptr.set(e.pointerId, [e.offsetX, e.offsetY]);
+        if(ptr.size === 1){ const [x0,y0] = drag.pts.get(e.pointerId) || [drag.x, drag.y], dx = e.offsetX - x0, dy = e.offsetY - y0;
+          if(Math.hypot(dx, dy) > 4) drag.moved = true;
+          if(drag.moved){ const c = drag.cam; this.cam = {...c, cx: c.cx - dx/(c.k*c.cos), cy: c.cy + dy/c.k}; this.redraw(); this.tip.style.display = 'none'; fv.style.cursor = 'grabbing'; } }
+        else if(ptr.size === 2 && drag.pts.size === 2){ const a = [...ptr.values()], b = [...drag.pts.values()];
+          const d1 = Math.hypot(a[0][0]-a[1][0], a[0][1]-a[1][1]), d0 = Math.hypot(b[0][0]-b[1][0], b[0][1]-b[1][1]) || 1;
+          const mx = (a[0][0]+a[1][0])/2, my = (a[0][1]+a[1][1])/2, bx = (b[0][0]+b[1][0])/2, by = (b[0][1]+b[1][1])/2, c = drag.cam;
+          const lon = (bx - this.W/2)/(c.k*c.cos) + c.cx, lat = c.cy - (by - this.Hh/2)/c.k, k = Math.max(this.kmin, Math.min(30000, c.k * d1/d0));
+          this.cam = {k, cos:c.cos, cx: lon - (mx - this.W/2)/(k*c.cos), cy: lat + (my - this.Hh/2)/k}; drag.moved = true; this.redraw(); }
+        return; }
+      this.hover(e.offsetX, e.offsetY); });
+    const end = e => { const was = drag; ptr.delete(e.pointerId); fv.style.cursor = '';
+      if(was && !was.moved && e.type === 'pointerup'){ const s = this.hitStation(e.offsetX, e.offsetY); this.sel = s; this.showCard(); this.drawBase(); if(!s && e.pointerType !== 'mouse') this.hover(e.offsetX, e.offsetY); }
+      if(ptr.size === 0) drag = null; else drag = {cam:{...this.cam}, pts:new Map([...ptr].map(([k,v]) => [k,[...v]])), moved:true}; };
+    fv.addEventListener('pointerup', end); fv.addEventListener('pointercancel', end);
+    fv.addEventListener('pointerleave', () => { this.tip.style.display = 'none'; this.active = false; });
+  }
+  flash(){ this.hint.classList.add('on'); clearTimeout(this.ht); this.ht = setTimeout(() => this.hint.classList.remove('on'), 1200); }
+  swipe(el, knob){ this.swEl = el; let on = false;
+    const set = x => { this.split = Math.max(.04, Math.min(.96, x / this.W)); knob.setAttribute('aria-valuenow', Math.round(this.split*100)); this.drawBase(); this.placeSwipe(); };
+    knob.addEventListener('pointerdown', e => { on = true; knob.setPointerCapture(e.pointerId); e.stopPropagation(); });
+    knob.addEventListener('pointermove', e => { if(on){ const r = this.stage.getBoundingClientRect(); set(e.clientX - r.left); } });
+    knob.addEventListener('pointerup', () => on = false);
+    knob.addEventListener('keydown', e => { if(e.key === 'ArrowLeft' || e.key === 'ArrowRight'){ e.preventDefault(); set((this.split + (e.key === 'ArrowLeft' ? -.05 : .05)) * this.W); } }); }
+  placeSwipe(){ if(this.swEl) this.swEl.style.left = (this.split * this.W) + 'px'; }
+
+  /* ---------- drawing ---------- */
+  drawBase(){ if(!this.W || !this.pst) return; const c = this.b; c.clearRect(0,0,this.W,this.Hh);
+    if(this.mode === 'cmp'){ const sx = this.split * this.W;
+      c.save(); c.beginPath(); c.rect(0,0,sx,this.Hh); c.clip(); this.scene(c, 'L'); c.restore();
+      c.save(); c.beginPath(); c.rect(sx,0,this.W-sx,this.Hh); c.clip(); c.fillStyle = 'rgba(37,99,235,.035)'; c.fillRect(sx,0,this.W-sx,this.Hh); this.scene(c, 'R'); c.restore(); }
+    else this.scene(c, 'M');
+    this.labels(c); }
+  scene(c, sd){
+    const zoom = this.cam.k > 120, fc = this.mode === 'fc' || sd === 'R', red = fc ? 'rgba(37,99,235,.17)' : 'rgba(220,38,38,.17)', redS = fc ? 'rgba(37,99,235,.85)' : 'rgba(220,38,38,.85)';
+    const pat = c.createPattern(HATCH, 'repeat'), ring = r => { r.forEach(([x,y],i) => { const [px,py] = this.P(x,y); i ? c.lineTo(px,py) : c.moveTo(px,py); }); c.closePath(); };
+    G.provinces.forEach((p, i) => { c.beginPath(); for(const r of p.rings) ring(r); const st = this.pst[sd][i];
+      c.fillStyle = p.st.length ? '#ffffff' : '#f7f9fc'; c.fill('evenodd');
+      if(!zoom){ if(st === 'red'){ c.fillStyle = red; c.fill('evenodd'); } else if(st === 'watch'){ c.fillStyle = 'rgba(234,88,12,.12)'; c.fill('evenodd'); } else if(p.ctx && p.ctx.downstream_no_data){ c.fillStyle = pat; c.fill('evenodd'); } }
+      c.strokeStyle = zoom ? 'rgba(15,23,42,.10)' : 'rgba(71,85,105,.32)'; c.lineWidth = zoom ? 1 : .7; c.stroke(); });
+    c.setLineDash([5,4]); for(const p of G.provinces){ if(!(p.ctx && p.ctx.ddc_surveillance)) continue; c.beginPath(); for(const r of p.rings) ring(r); c.strokeStyle = 'rgba(220,38,38,.8)'; c.lineWidth = zoom ? 2 : 1.3; c.stroke(); } c.setLineDash([]);
+    if(zoom) G.amphoe.forEach((a, i) => { c.beginPath(); for(const r of a.rings) ring(r); const st = this.ast[sd][i];
+      if(st === 'red'){ c.fillStyle = red; c.fill(); c.strokeStyle = redS; c.lineWidth = 1.4; c.stroke(); }
+      else if(st === 'watch'){ c.fillStyle = 'rgba(234,88,12,.08)'; c.fill(); c.strokeStyle = 'rgba(234,88,12,.6)'; c.lineWidth = 1; c.stroke(); }
+      else { c.strokeStyle = 'rgba(15,23,42,.07)'; c.lineWidth = .8; c.stroke(); } });
+    c.lineCap = 'round'; c.lineJoin = 'round';
+    for(const tr of G.thai_rivers || []){ c.beginPath(); tr.pts.forEach(([x,y],i) => { const [px,py] = this.P(x,y); i ? c.lineTo(px,py) : c.moveTo(px,py); });
+      c.strokeStyle = tr === this.hl ? 'rgba(37,99,235,.95)' : 'rgba(96,165,250,.75)'; c.lineWidth = (zoom ? 2.4 : 1.3) * (tr === this.hl ? 2 : 1); c.stroke(); }
+    for(const rv of G.rivers){ const pr = this.prof[sd][rv.id] || [], hl = rv === this.hl;
+      for(const pass of [0,1]) for(let i=1;i<rv.pts.length;i++){ const [x0,y0] = this.P(...rv.pts[i-1]), [x1,y1] = this.P(...rv.pts[i]); const v = pr[i];
+        c.beginPath(); c.moveTo(x0,y0); c.lineTo(x1,y1);
+        if(pass === 0){ c.strokeStyle = v == null ? 'rgba(148,163,184,.22)' : rgb(v, hl ? .35 : .18); c.lineWidth = (zoom ? 10 : 5) * (hl ? 1.6 : 1); }
+        else { c.strokeStyle = v == null ? 'rgba(148,163,184,.9)' : rgb(v, .95); c.lineWidth = (zoom ? 2.2 : 1.6) * (hl ? 1.5 : 1); if(fc && v != null) c.setLineDash([6,4]); }
+        c.stroke(); c.setLineDash([]); } }
+    for(const o of OBS){ if(o.lat == null || o.lon == null) continue; const v = this.val(o.station_id, sd); const [x,y] = this.P(o.lon, o.lat);
+      if(x < -10 || x > this.W+10 || y < -10 || y > this.Hh+10) continue;
+      const r = zoom ? 5.5 : 3.6, isF = v && v.kind === 'fc';
+      c.beginPath(); if(isF){ c.moveTo(x, y-r-1.5); c.lineTo(x+r+1.5, y); c.lineTo(x, y+r+1.5); c.lineTo(x-r-1.5, y); c.closePath(); } else c.arc(x,y,r,0,7);
+      c.fillStyle = v ? (v.low ? '#fff' : rgb(v.c)) : '#cbd5e1'; c.fill(); c.lineWidth = o.station_id === this.sel ? 3 : 1.6;
+      c.strokeStyle = o.station_id === this.sel ? '#0f172a' : v && v.low ? rgb(v.c) : '#fff'; c.stroke();
+      if(v && (v.ex || (isF && !v.low && v.p >= .5))){ c.beginPath(); c.arc(x,y,r+5,0,7); c.strokeStyle = rgb(v.c,.6); c.lineWidth = 1.2; if(isF) c.setLineDash([2,2]); c.stroke(); c.setLineDash([]); } } }
+  labels(c){ const zoom = this.cam.k > 120;
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    const L = (t, lon, lat, font, color) => { const [px,py] = this.P(lon,lat); if(px < -40 || px > this.W+40 || py < -20 || py > this.Hh+20) return; c.font = font; c.fillStyle = color; c.fillText(t, px, py); };
+    const sd = this.mode === 'cmp' ? 'L' : 'M';
+    if(zoom){ G.amphoe.forEach((a, i) => { if(!a.st.length && this.cam.k < 900) return; const [x,y] = centroid(a); const st = this.ast[sd][i];
+        L('อ.' + a.name_th, x, y, '500 12px "Sarabun","TH Sarabun New", sans-serif', st === 'red' ? (this.mode === 'fc' ? '#1d4ed8' : '#b91c1c') : st === 'watch' ? '#c2410c' : 'rgba(71,85,105,.6)'); });
+      for(const p of G.provinces){ if(!p.st.length || this.view === 'basin') continue; const [x,y] = centroid(p); L('จ.' + p.name_th, x, y, '500 13px "Sarabun","TH Sarabun New", sans-serif', 'rgba(51,65,85,.7)'); } }
+    else { const show = ['Chiang Rai','Chiang Mai','Mae Hong Son','Loei','Nong Khai','Bueng Kan','Nakhon Phanom','Mukdahan','Amnat Charoen','Ubon Ratchathani','Bangkok','Udon Thani','Sakon Nakhon','Nan','Phayao'];
+      G.provinces.forEach((p, i) => { if(!show.includes(p.name)) return; const [x,y] = centroid(p), st = this.pst[sd][i];
+        L(p.name_th, x, y, `${st === 'red' ? 600 : 400} 11.5px "Sarabun","TH Sarabun New", sans-serif`, st === 'red' ? (this.mode === 'fc' ? '#1d4ed8' : '#b91c1c') : 'rgba(51,65,85,.62)'); }); }
+    if(this.cam.k < 400) for(const tr of G.thai_rivers || []){ const m = tr.pts[Math.floor(tr.pts.length*.45)]; L(tr.name_th.replace('แม่น้ำ','น.'), m[0]+.12, m[1], '400 10.5px "Sarabun","TH Sarabun New", sans-serif', 'rgba(37,99,235,.7)'); }
+    const CL = [['เมียนมา',99.6,20.62],['สปป.ลาว',100.48,20.52],['เมียนมา',97.45,18.3],['สปป.ลาว',102.4,19.4],['กัมพูชา',104.8,12.8],['เวียดนาม',106.6,10.4],['ทะเลอันดามัน',97.6,10.5],['อ่าวไทย',101.2,10.6],['ทะเลจีนใต้',106.8,9.0]];
+    for(const [t,x,y] of CL) L(t, x, y, '400 12px "Sarabun","TH Sarabun New", sans-serif', 'rgba(71,85,105,.55)');
+    if(zoom){ const RL = {kok:[99.62,19.99],sai:[99.80,20.47],ruak:[99.80,20.62],mekong:[100.33,20.33],fang:[99.27,19.90],salween:[97.6,17.95]};
+      for(const rv of G.rivers) if(RL[rv.id]) L(rv.name_th, ...RL[rv.id], '500 13px "Sarabun","TH Sarabun New", sans-serif', 'rgba(30,64,175,.7)');
+      if(this.cam.k > 160) for(const o of OBS){ if(o.lat == null) continue; const [x,y] = this.P(o.lon, o.lat); if(x < 0 || x > this.W || y < 0 || y > this.Hh) continue; c.font = '500 11px "Sarabun","TH Sarabun New", sans-serif'; c.fillStyle = 'rgba(15,23,42,.75)'; c.textAlign = 'left'; c.fillText(o.station_id, x+8, y-8); c.textAlign = 'center'; } } }
+
+  /* ---------- hover: stations, arsenic rivers, other Thai rivers, provinces ---------- */
+  hitStation(x, y){ let best = null, bd = 14*14; for(const o of OBS){ if(o.lat == null || o.lon == null) continue; const [px,py] = this.P(o.lon,o.lat); const d = (px-x)**2+(py-y)**2; if(d < bd){ bd = d; best = o.station_id; } } return best; }
+  hitRiver(x, y){ let best = null, bd = 9; const onS = bb => { const [x0,y1] = this.P(bb[0],bb[1]), [x1,y0] = this.P(bb[2],bb[3]); return x >= x0-10 && x <= x1+10 && y >= y0-10 && y <= y1+10; };
+    const test = (rv, thai) => { if(!onS(rv.bb)) return; let prev = this.P(...rv.pts[0]);
+      for(let i=1;i<rv.pts.length;i++){ const cur = this.P(...rv.pts[i]); const dx = cur[0]-prev[0], dy = cur[1]-prev[1], l2 = dx*dx+dy*dy || 1;
+        const t = Math.max(0, Math.min(1, ((x-prev[0])*dx + (y-prev[1])*dy)/l2)), d = Math.hypot(x - prev[0] - t*dx, y - prev[1] - t*dy);
+        if(d < bd){ bd = d; best = {rv, thai, i: i-1+t, lon: rv.pts[i-1][0] + (rv.pts[i][0]-rv.pts[i-1][0])*t, lat: rv.pts[i-1][1] + (rv.pts[i][1]-rv.pts[i-1][1])*t}; } prev = cur; } };
+    for(const rv of G.rivers) test(rv, false); for(const tr of G.thai_rivers || []) test(tr, true); return best; }
+  hover(x, y){ const tip = this.tip, show = html => { tip.innerHTML = html; tip.style.display = 'block'; tip.style.left = Math.min(this.W - 160, Math.max(160, x)) + 'px'; tip.style.top = y + 'px'; };
+    const s = this.hitStation(x, y); let hl = null;
+    if(s){ show(this.stationTip(s)); this.fv.style.cursor = 'pointer'; }
+    else { const h = this.hitRiver(x, y); this.fv.style.cursor = h ? 'crosshair' : 'grab';
+      if(h){ hl = h.rv; show(h.thai ? `<b>${esc(h.rv.name_th)}</b><div class="m">${esc(placeOf(h.lon, h.lat))} ไหลลง ${esc(h.rv.to)}</div><div class="m">ไม่อยู่ในเส้นทางสารหนูของชุดข้อมูลนี้ ไม่มีจุดตรวจ</div>` : this.riverTip(h)); }
+      else if(this.cam.k < 150){ const [lon, lat] = this.unP(x, y), pv = G.provinces.find(q => q.rings.some(r => inPoly(lon, lat, r)));
+        if(pv){ const c = pv.ctx; show(`<b>จ.${esc(pv.name_th)}</b>${pv.st.length ? `<div class="m">${pv.st.length} จุดตรวจ</div>` : ''}${c && c.ddc_surveillance ? `<div class="m">กรมควบคุมโรคเฝ้าระวัง เกินค่าอ้างอิง ${c.ddc_above_ref}/${c.ddc_urine_tested} คน</div>` : c && c.downstream_no_data ? '<div class="m">ปลายน้ำโขง ยังไม่มีผลตรวจ</div>' : ''}`); }
+        else tip.style.display = 'none'; }
+      else tip.style.display = 'none'; }
+    if(hl !== this.hl){ this.hl = hl; this.drawBase(); } }
+  sideAt(x){ return this.mode === 'cmp' ? (x < this.split * this.W ? 'L' : 'R') : 'M'; }
+  stationTip(s){ const o = ST[s], last = lastObs(s), f = fcOf(s), hz = f && f.horizons && f.horizons[(this.mode === 'fc' ? this.h : 1) - 1];
+    const rows = [];
+    if(this.mode === 'cmp'){ const a = this.val(s, 'L'), b = this.val(s, 'R');
+      rows.push(`<div class="r o"><span>ค่าจริง ${esc(thDate(this.t,{day:'numeric',month:'short'}))}</span><b>${a ? esc(a.txt) : '–'}</b></div>`, `<div class="r f"><span>พยากรณ์ไว้ (P50)</span><b>${b ? esc(b.txt) : '–'}</b></div>`);
+      if(b) rows.push(`<div class="m">ช่วง P10–P90 ${fmt(b.b.p10)}–${fmt(b.b.p90)}</div>`); }
+    else { const v = this.mode === 'obs' ? this.val(s, 'M') : null, e = v ? v.e : last;
+      rows.push(`<div class="r o"><span>ค่าจริง ${e ? esc(thDate(e.t_mid,{day:'numeric',month:'short',year:'2-digit'})) : ''}</span><b>${e ? esc(e.value_reported) : '–'}</b></div>`);
+      if(hz) rows.push(`<div class="r f"><span>พยากรณ์ ${esc(thDate(hz.target_date,{day:'numeric',month:'short',year:'2-digit'}))}</span><b>${fmt(hz.p50)}</b></div><div class="m">P10–P90 ${fmt(hz.p10)}–${fmt(hz.p90)} โอกาสเกิน ${Math.round(hz.prob_exceed*100)}%${hz.reliability !== 'normal' ? ' ความน่าเชื่อถือต่ำ' : ''}</div>`); }
+    return `<b>${esc(s)} ${esc(o.river)}</b><div class="m">${o.tambon ? 'ต.' + esc(o.tambon) + ' ' : ''}อ.${esc(o.amphoe)} จ.${esc(o.province)}</div>${rows.join('')}<div class="m">หน่วย มก./ล. คลิกเพื่อดูกราฟ</div>`; }
+  riverTip(h){ const rv = h.rv, place = placeOf(h.lon, h.lat);
+    const up = rv.anc.filter(a => a.i <= h.i).slice(-1)[0], dn = rv.anc.find(a => a.i > h.i);
+    const fcv = s => { const f = fcOf(s), z = f && f.horizons && f.horizons[(this.mode === 'fc' ? this.h : 1) - 1]; return z && z.reliability === 'normal' ? {c:z.p50} : null; };
+    const obsv = s => { const e = obsAt(s, this.mode === 'obs' ? this.t : LAST_T); return e ? {c:cOf(e)} : null; };
+    let realP, fcP, realLab, fcLab;
+    if(this.mode === 'cmp'){ realP = this.prof.L[rv.id]; fcP = this.prof.R[rv.id]; realLab = 'ค่าจริง ' + thDate(this.t,{day:'numeric',month:'short'}); fcLab = 'พยากรณ์ไว้'; }
+    else { realP = this.mode === 'obs' ? this.prof.M[rv.id] : profileOf(rv, obsv); fcP = this.mode === 'fc' ? this.prof.M[rv.id] : profileOf(rv, fcv);
+      realLab = 'ค่าจริง ' + (this.mode === 'obs' ? thDate(this.t,{day:'numeric',month:'short'}) : 'ล่าสุด'); fcLab = this.mode === 'fc' && this.h > 1 ? `พยากรณ์ ${this.h} รอบข้างหน้า` : 'พยากรณ์รอบหน้า'; }
+    const rv1 = concAt(realP, h.i), fv1 = concAt(fcP, h.i);
+    const nb = a => { if(!a) return ''; const e = lastObs(a.s), f = fcOf(a.s); return `${esc(a.s)} ${e ? esc(e.value_reported) : '–'}${f ? ` → <span class="f">${fmt(f.p50)}</span>` : ''}`; };
+    return `<b>${esc(rv.name_th)}</b><div class="m">${esc(place)}</div>
+      <div class="r o"><span>${esc(realLab)}</span><b>${rv1 == null ? 'ไม่มีจุดตรวจใกล้' : rv1 < STD ? 'ต่ำกว่า 0.010' : '≈ ' + fmt(rv1)}</b></div>
+      <div class="r f"><span>${esc(fcLab)}</span><b>${fv1 == null ? '–' : '≈ ' + fmt(fv1)}</b></div>
+      <div class="m">ค่าระหว่างจุดเป็นการประมาณจากจุดตรวจ ไม่ใช่ค่าตรวจวัด</div>
+      ${up || dn ? `<div class="m">ต้นน้ำ: ${nb(up) || '–'}<br>ท้ายน้ำ: ${nb(dn) || '–'}<br>(ค่าจริงล่าสุด → พยากรณ์รอบหน้า)</div>` : ''}`; }
+  showCard(){ const el = this.card, s = this.sel; if(!s){ el.classList.remove('on'); return; }
+    const o = ST[s], f = fcOf(s);
+    el.innerHTML = `<button class="x" aria-label="ปิด">×</button><div class="sub">${esc(o.river)} ${esc(s)}</div>
+      <div>${esc(o.site)}${o.tambon ? ' ต.' + esc(o.tambon) : ''} อ.${esc(o.amphoe)} จ.${esc(o.province)}</div>
+      <div style="margin-top:8px">${tsChart(s, 284, 70, {small:true})}</div>
+      <div class="sub" style="font-size:12px">เส้นทึบ = ค่าจริง เส้นประสีน้ำเงิน = ค่าพยากรณ์</div>
+      ${this.stationTip(s).replace(/class="m"/g, 'class="sub" style="font-size:12px"').replace(/class="r o"/g,'class="r" style="display:flex;justify-content:space-between"').replace(/class="r f"/g,'class="r" style="display:flex;justify-content:space-between;color:var(--fc)"')}
+      <button class="btn" style="margin-top:10px;min-height:36px;font-size:13px">ดูกราฟค่าจริงเทียบค่าพยากรณ์</button>`;
+    el.classList.add('on'); el.querySelector('.x').onclick = () => { this.sel = null; this.showCard(); this.drawBase(); };
+    el.querySelector('.btn').onclick = () => { $('#cmpSel').value = s; renderCompare(); $('#compare').scrollIntoView({behavior: reduce ? 'auto' : 'smooth'}); }; }
+
+  /* ---------- particles ---------- */
+  onScreen(rv){ const [x0,y1] = this.P(rv.bb[0],rv.bb[1]), [x1,y0] = this.P(rv.bb[2],rv.bb[3]); return x1 > 0 && x0 < this.W && y1 > 0 && y0 < this.Hh; }
+  pos(rv, d){ const km = rv.km; let lo=0, hi=km.length-1; while(hi-lo>1){ const m=(lo+hi)>>1; km[m] <= d ? lo=m : hi=m; }
+    const t = (d - km[lo]) / ((km[hi]-km[lo]) || 1), a = rv.pts[lo], b = rv.pts[hi]; return {lon:a[0]+(b[0]-a[0])*t, lat:a[1]+(b[1]-a[1])*t, i:lo+t, a, b}; }
+  spawn(p){ const list = G.rivers.filter(r => this.onScreen(r)); const L = list.length ? list : G.rivers, tot = L.reduce((a,r) => a + r.len, 0);
+    for(let k=0;k<14;k++){ let u = Math.random()*tot, rv = L[0]; for(const r of L){ u -= r.len; if(u <= 0){ rv = r; break; } }
+      const d = Math.random()*rv.len, c = concAt((this.prof.M || this.prof.L)[rv.id], this.pos(rv, d).i), w = c == null ? .15 : Math.min(1, .25 + Math.log10(c/0.005)*.6);
+      if(Math.random() < w || k === 13){ Object.assign(p, {rv, d, age:0, life: 60 + Math.random()*120, off: Math.random()-.5, prev:null}); return p; } } return p; }
+  spawnAll(){ this.parts = []; const n = this.W < 600 ? 600 : 1200; for(let i=0;i<n;i++) this.parts.push(this.spawn({})); }
+  step(){ if(this.camT) this.camT(performance.now());
+    const c = this.f, zoom = this.cam.k > 120, sx = this.split * this.W, kmpp = 111 / this.cam.k;
+    c.globalCompositeOperation = 'destination-out'; c.fillStyle = 'rgba(0,0,0,.10)'; c.fillRect(0,0,this.W,this.Hh); c.globalCompositeOperation = 'source-over'; c.lineCap = 'round';
+    for(const p of this.parts){ if(!p.rv){ this.spawn(p); continue; }
+      p.d += (SPEED[p.rv.id] || 1) * 1.1 * kmpp * (0.8 + Math.abs(p.off)*.4); p.age++;
+      if(p.d >= p.rv.len){ const dn = G.rivers.find(r => r.id === p.rv.downstream); if(dn){ const ji = p.rv.join_index || 0; p.rv = dn; p.d = dn.km[ji] || 0; } else { this.spawn(p); continue; } }
+      if(p.age > p.life){ this.spawn(p); continue; }
+      const q = this.pos(p.rv, p.d), [ax,ay] = this.P(...q.a), [bx,by] = this.P(...q.b), sl = Math.hypot(bx-ax, by-ay) || 1, [cx0,cy0] = this.P(q.lon, q.lat);
+      const side = this.mode === 'cmp' ? (cx0 < sx ? 'L' : 'R') : 'M', cv = concAt(this.prof[side][p.rv.id], q.i);
+      const band = zoom ? (cv == null ? 2.5 : 2.5 + 9*Math.max(0, Math.min(1, Math.log10(cv/0.005)/1.8))) : 1.4;
+      const x = cx0 - (by-ay)/sl*p.off*2*band, y = cy0 + (bx-ax)/sl*p.off*2*band;
+      if(p.prev){ const a = Math.min(1, p.age/12) * (1 - p.age/p.life);
+        c.strokeStyle = cv == null ? `rgba(100,116,139,${.35*a})` : rgb(cv, .9*a); c.lineWidth = zoom ? (cv != null && cv > STD ? 2.3 : 1.5) : 1.2;
+        c.beginPath(); c.moveTo(p.prev[0], p.prev[1]); c.lineTo(x, y); c.stroke(); }
+      p.prev = [x, y]; } }
+  loop(){ if(this.raf) return; const tick = () => { this.raf = 0; if(!this.vis || document.hidden) return;
+      if(reduce){ if(this.camT){ this.camT(performance.now()); this.raf = requestAnimationFrame(tick); } return; }
+      this.step(); this.raf = requestAnimationFrame(tick); }; this.raf = requestAnimationFrame(tick); }
+}
+
+/* ---------- time-series chart: measured (solid) vs forecast (dashed blue) ---------- */
+function tsChart(sid, w, h, opt = {}){
+  const list = H[sid] || [], bt = BT[sid] || [], f = fcOf(sid), hz = f && f.horizons ? f.horizons : [];
+  if(!list.length) return '';
+  const pad = opt.small ? {l:6,r:8,t:6,b:6} : {l:46,r:16,t:12,b:30};
+  const all = [...list.map(e => e.t_mid), ...bt.map(b => b.t), ...hz.map(z => z.target_date)].sort();
+  const t0 = +new Date(all[0]) - 10*864e5, t1 = +new Date(all[all.length-1]) + 14*864e5;
+  const vmax = Math.max(0.03, ...list.map(e => e.value || 0), ...bt.map(b => b.p90), ...hz.map(z => z.p90)) * 1.25, vmin = 0.002;
+  const X = t => pad.l + (+new Date(t) - t0) / (t1 - t0) * (w - pad.l - pad.r);
+  const Y = c => { const a = Math.log10(vmin), b = Math.log10(vmax); return h - pad.b - (Math.log10(Math.max(vmin, c)) - a) / (b - a) * (h - pad.t - pad.b); };
+  let s = '';
+  if(!opt.small){ for(const v of [0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5]) if(v <= vmax) s += `<line x1="${pad.l}" x2="${w-pad.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="rgba(15,23,42,.06)"/><text x="${pad.l-6}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="#5b6577">${v}</text>`;
+    const d0 = new Date(t0); d0.setDate(1); for(let d = new Date(d0); +d <= t1; d.setMonth(d.getMonth() + (w < 500 ? 4 : 2))){ if(+d < t0) continue; const x = X(d.toISOString().slice(0,10)); s += `<line x1="${x}" x2="${x}" y1="${pad.t}" y2="${h-pad.b}" stroke="rgba(15,23,42,.05)"/><text x="${x}" y="${h-10}" text-anchor="middle" font-size="11" fill="#5b6577">${esc(d.toLocaleDateString('th-TH',{month:'short',year:'2-digit'}))}</text>`; }
+    const xl = X(list[list.length-1].t_mid); s += `<rect x="${xl}" y="${pad.t}" width="${w-pad.r-xl}" height="${h-pad.t-pad.b}" fill="rgba(37,99,235,.04)"/><text x="${xl+6}" y="${pad.t+12}" font-size="11" fill="#1d4ed8">อนาคต</text>`; }
+  s += `<line x1="${pad.l}" x2="${w-pad.r}" y1="${Y(STD)}" y2="${Y(STD)}" stroke="#dc2626" stroke-width="1.1" stroke-dasharray="2 3"/>`;
+  if(!opt.small) s += `<text x="${pad.l+4}" y="${Y(STD)-5}" font-size="11" fill="#b91c1c">มาตรฐาน 0.01</text>`;
+  if(bt.length){ const up = bt.map(b => `${X(b.t).toFixed(1)},${Y(b.p90).toFixed(1)}`), dn = bt.slice().reverse().map(b => `${X(b.t).toFixed(1)},${Y(b.p10).toFixed(1)}`);
+    s += `<polygon points="${up.concat(dn).join(' ')}" fill="rgba(37,99,235,.12)"/><polyline points="${bt.map(b => `${X(b.t).toFixed(1)},${Y(b.p50).toFixed(1)}`).join(' ')}" fill="none" stroke="#2563eb" stroke-width="${opt.small ? 1.2 : 1.8}" stroke-dasharray="5 4"/>`;
+    if(!opt.small) for(const b of bt) s += `<circle cx="${X(b.t)}" cy="${Y(b.p50)}" r="2.6" fill="#fff" stroke="#2563eb" stroke-width="1.4"><title>พยากรณ์ไว้สำหรับ ${esc(thDate(b.t))}: P50 ${fmt(b.p50)} (P10–P90 ${fmt(b.p10)}–${fmt(b.p90)})</title></circle>`; }
+  if(hz.length){ const last = list[list.length-1], x0 = X(last.t_mid), y0 = Y(cOf(last));
+    s += `<polygon points="${x0},${y0} ${hz.map(z => `${X(z.target_date)},${Y(z.p90)}`).join(' ')} ${hz.slice().reverse().map(z => `${X(z.target_date)},${Y(z.p10)}`).join(' ')}" fill="rgba(37,99,235,.10)"/>`;
+    s += `<polyline points="${x0},${y0} ${hz.map(z => `${X(z.target_date)},${Y(z.p50)}`).join(' ')}" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+    hz.forEach((z, i) => { const x1 = X(z.target_date), r = opt.small ? 3 - i*.4 : 6 - i; s += `<path d="M${x1} ${Y(z.p50)-r}l${r} ${r}-${r} ${r}-${r}-${r}z" fill="${i === 0 ? '#2563eb' : '#fff'}" stroke="#2563eb" stroke-width="1.4"><title>พยากรณ์ ${i+1} รอบข้างหน้า ${esc(thDate(z.target_date))}: P50 ${fmt(z.p50)} (P10–P90 ${fmt(z.p10)}–${fmt(z.p90)}) โอกาสเกิน ${Math.round(z.prob_exceed*100)}%</title></path>`; });
+    if(!opt.small) s += `<text x="${X(hz[0].target_date)-8}" y="${Y(hz[0].p90)-6}" text-anchor="end" font-size="11" fill="#1d4ed8">พยากรณ์ 1–3 รอบ</text>`; }
+  s += `<polyline points="${list.map(e => `${X(e.t_mid).toFixed(1)},${Y(e.censor === 'none' ? e.value : e.value_high).toFixed(1)}`).join(' ')}" fill="none" stroke="#0f172a" stroke-width="${opt.small ? 1.3 : 2}" stroke-linejoin="round"/>`;
+  for(const e of list){ const x = X(e.t_mid), y = Y(e.censor === 'none' ? e.value : e.value_high), r = opt.small ? 2 : 3.6;
+    const tt = `<title>ค่าจริง ${esc(thDate(e.t_mid))}: ${esc(e.value_reported)} มก./ล. (ครั้งที่ ${e.round})</title>`;
+    s += e.censor === 'none' ? `<circle cx="${x}" cy="${y}" r="${r}" fill="${isEx(e) ? '#0f172a' : '#fff'}" stroke="#0f172a" stroke-width="1.4">${tt}</circle>` : `<path d="M${x} ${y-r}l${r} ${r}-${r} ${r}-${r}-${r}z" fill="#fff" stroke="#0f172a" stroke-width="1.3">${tt}</path>`; }
+  return `<svg class="${opt.small ? 'spark' : 'chart'}" viewBox="0 0 ${w} ${h}" ${opt.small ? `width="${w}" height="${h}"` : ''} role="img" aria-label="กราฟค่าจริงเทียบค่าพยากรณ์ของ ${esc(sid)}">${s}</svg>`; }
+function sparkObs(sid){ const list = H[sid] || [], w = 150, h = 34; if(!list.length) return '';
+  const lv = c => Math.log10(Math.max(c, .004)), y0 = lv(.004), y1 = lv(.3), X = i => 3 + i/(Math.max(1,list.length-1))*(w-6), Y = c => h-3 - (lv(c)-y0)/(y1-y0)*(h-6);
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><line x1="0" x2="${w}" y1="${Y(STD)}" y2="${Y(STD)}" stroke="#dc2626" stroke-opacity=".5" stroke-dasharray="2 3"/><polyline points="${list.map((e,i) => `${X(i).toFixed(1)},${Y(cOf(e)).toFixed(1)}`).join(' ')}" fill="none" stroke="#0f172a" stroke-width="1.3"/>${list.map((e,i) => isEx(e) ? `<circle cx="${X(i).toFixed(1)}" cy="${Y(e.value).toFixed(1)}" r="1.8" fill="#0f172a"/>` : '').join('')}</svg>`; }
+
+/* ---------- my area: province -> amphoe -> tambon report ---------- */
+const RIVER_NAME = {kok:'แม่น้ำกก', sai:'แม่น้ำสาย', ruak:'แม่น้ำรวก', mekong:'แม่น้ำโขง', fang:'แม่น้ำฝาง', salween:'แม่น้ำสาละวิน'};
+const VIEW_OF = {kok:'basin', sai:'basin', ruak:'basin', fang:'basin', mekong:'mekong', salween:'salween'};
+let AREA = null;
+function myArea(){
+  const P = LOC.provinces, ap = $('#ap'), aa = $('#aa'), at = $('#at'), q = $('#aq'), sug = $('#asug');
+  const order = P.map((p,i) => i).sort((a,b) => (P[b].near - P[a].near) || P[a].th.localeCompare(P[b].th, 'th'));
+  ap.innerHTML = '<option value="">เลือกจังหวัด</option>' + `<optgroup label="จังหวัดที่อยู่ใกล้แม่น้ำที่ตรวจพบ">${order.filter(i => P[i].near).map(i => `<option value="${i}">${esc(P[i].th)}</option>`).join('')}</optgroup><optgroup label="จังหวัดอื่น">${order.filter(i => !P[i].near).map(i => `<option value="${i}">${esc(P[i].th)}</option>`).join('')}</optgroup>`;
+  const fillA = () => { const p = P[ap.value]; aa.disabled = !p; at.disabled = true;
+    aa.innerHTML = '<option value="">' + (p ? 'ทั้งจังหวัด' : 'เลือกจังหวัดก่อน') + '</option>' + (p ? p.a.map((a,i) => `<option value="${i}">${esc(a.th)}</option>`).join('') : '');
+    at.innerHTML = '<option value="">เลือกอำเภอก่อน</option>'; };
+  const fillT = () => { const p = P[ap.value], a = p && p.a[aa.value]; at.disabled = !(a && a.t);
+    at.innerHTML = a && a.t ? '<option value="">ทั้งอำเภอ</option>' + a.t.map((t,i) => `<option value="${i}">${esc(t.th)}</option>`).join('') : `<option value="">${a ? 'จังหวัดนี้แสดงผลระดับอำเภอ' : 'เลือกอำเภอก่อน'}</option>`; };
+  const go = () => { const pi = ap.value === '' ? null : +ap.value, ai = aa.value === '' ? null : +aa.value, ti = at.value === '' ? null : +at.value;
+    AREA = [pi, ai, ti]; try { history.replaceState(null, '', pi == null ? location.pathname : `#area=${pi}.${ai ?? ''}.${ti ?? ''}`); } catch(e){}
+    try { localStorage.setItem('arsenic-area', JSON.stringify(AREA)); } catch(e){}
+    areaReport(pi, ai, ti); };
+  ap.onchange = () => { fillA(); go(); }; aa.onchange = () => { fillT(); go(); }; at.onchange = go;
+  const set = (pi, ai, ti) => { ap.value = pi ?? ''; fillA(); aa.value = ai ?? ''; fillT(); at.value = ti ?? ''; go(); };
+  // search across all names
+  const idx = []; P.forEach((p,pi) => { idx.push({n:p.th, lab:'จ.' + p.th, sub:'จังหวัด', k:[pi,null,null]});
+    p.a.forEach((a,ai) => { idx.push({n:a.th, lab:'อ.' + a.th, sub:'จ.' + p.th, k:[pi,ai,null]}); (a.t || []).forEach((t,ti) => idx.push({n:t.th, lab:'ต.' + t.th, sub:'อ.' + a.th + ' จ.' + p.th, k:[pi,ai,ti]})); }); });
+  let hits = [], cur = -1;
+  const show = () => { sug.innerHTML = hits.map((h,i) => `<li role="option" id="as${i}" aria-selected="${i === cur}">${esc(h.lab)}<small>${esc(h.sub)}</small></li>`).join(''); sug.classList.toggle('on', hits.length > 0); q.setAttribute('aria-expanded', hits.length > 0);
+    sug.querySelectorAll('li').forEach((li,i) => li.onmousedown = e => { e.preventDefault(); pick(i); }); };
+  const pick = i => { const h = hits[i]; if(!h) return; q.value = h.lab + ' ' + h.sub.replace('จังหวัด',''); hits = []; show(); set(...h.k); };
+  q.oninput = () => { const s = q.value.trim().replace(/^(ต\.|อ\.|จ\.|ตำบล|อำเภอ|จังหวัด)\s*/, ''); cur = -1;
+    hits = s.length < 1 ? [] : idx.filter(x => x.n.startsWith(s)).concat(idx.filter(x => !x.n.startsWith(s) && x.n.includes(s))).slice(0, 9); show(); };
+  q.onkeydown = e => { if(e.key === 'ArrowDown'){ e.preventDefault(); cur = Math.min(hits.length-1, cur+1); show(); } else if(e.key === 'ArrowUp'){ e.preventDefault(); cur = Math.max(0, cur-1); show(); }
+    else if(e.key === 'Enter'){ e.preventDefault(); pick(cur < 0 ? 0 : cur); } else if(e.key === 'Escape'){ hits = []; show(); } };
+  q.onblur = () => setTimeout(() => { hits = []; show(); }, 150);
+  fillA();
+  let init = null; const m = location.hash.match(/area=(\d+)\.(\d*)\.(\d*)/);
+  if(m) init = [+m[1], m[2] === '' ? null : +m[2], m[3] === '' ? null : +m[3]];
+  else { try { init = JSON.parse(localStorage.getItem('arsenic-area') || 'null'); } catch(e){} }
+  if(init && P[init[0]]) set(...init); else areaReport(null);
+}
+const riverOfStation = id => [['SAL','salween'],['E9','mekong'],['NK','mekong'],['KK','kok'],['SA','sai'],['RU','ruak'],['FA','fang']].find(([k]) => id.startsWith(k))?.[1] || null;
+function areaInfo(pi, ai, ti){
+  const p = LOC.provinces[pi], a = ai == null ? null : p.a[ai], t = a && a.t && ti != null ? a.t[ti] : null;
+  const ctx = CTX.affected_areas.provinces.find(x => x.name === p.en) || {};
+  const norm = s => s.replace(/^เมือง/, '');
+  const stIn = OBS.filter(o => o.province === p.th && (!a || o.amphoe.split('/').some(x => norm(x) === norm(a.th))));
+  let pool = t ? [t] : a ? (a.t || []) : p.a.flatMap(x => x.t || []);
+  let best = pool.filter(x => x.d != null).sort((x,y) => x.d - y.d)[0] || null, note = '';
+  if(t && t.d == null){ const am = (a.t || []).filter(x => x.d != null).sort((x,y) => x.d - y.d)[0]; best = am || null; note = 'ตำบลนี้ไม่มีพิกัดในฐานข้อมูลกลาง จึงใช้ระยะของอำเภอแทน'; }
+  // a state station inside the chosen area means the river runs through it
+  let d = best ? best.d : null, r = best ? best.r : null, s = best ? best.s : null;
+  if(stIn.length && (!t || t.d == null || stIn.some(o => o.tambon === (t && t.th)))){ const o = stIn.find(o => t && o.tambon === t.th) || stIn[0]; if(d == null || d > 2){ d = Math.min(d ?? 2, 2); } s = s && H[s] ? s : o.station_id; if(!r) r = riverOfStation(o.station_id); }
+  // all state stations relevant to the chosen area: nearest station of every tambon within 15 km, plus stations inside it
+  const cands = [...new Set([...(pool.filter(x => x.d != null && x.d <= 15).map(x => x.s)), ...(t ? [] : stIn.map(o => o.station_id)), s].filter(x => x && H[x]))];
+  const score = id => { const l = lastObs(id), f = fcOf(id); return (isEx(l) && days(LAST_T, l.t_mid) <= 120 ? 10 : 0) + (l.censor === 'none' ? l.value * 100 : 0) + (f ? f.prob_exceed : 0); };
+  cands.sort((x, y) => score(y) - score(x));
+  if(cands.length && (!t || t.d == null)){ s = cands[0]; r = riverOfStation(s) || r; }
+  return {p, a, t, ctx, d, r, s, note, stIn, cands, near: p.near};
+}
+function areaReport(pi, ai, ti){
+  const box = $('#areport');
+  if(pi == null){ box.innerHTML = `<div class="empty">เลือกจังหวัดที่คุณอยู่ หรือพิมพ์ชื่อตำบลในช่องค้นหา ผลจะแสดงตรงนี้</div>`; $('#ahint').textContent = ''; return; }
+  const I = areaInfo(pi, ai, ti), {p, a, t, ctx, d, r, s} = I;
+  const where = [t && 'ต.' + t.th, a && 'อ.' + a.th, 'จ.' + p.th].filter(Boolean).join(' ');
+  const last = s && H[s] ? lastObs(s) : null, f = s ? fcOf(s) : null, o = s ? ST[s] : null;
+  const fresh = last && days(LAST_T, last.t_mid) <= 120, exNow = fresh && isEx(last), prevEx = s && H[s] ? H[s].slice(-4, -1).some(isEx) : false;
+  const pr = f && f.reliability === 'normal' ? f.prob_exceed : null, down = !!ctx.downstream_no_data, ddc = ctx.ddc_surveillance;
+  const rn = r ? RIVER_NAME[r] : 'แม่น้ำที่ตรวจพบสารหนู';
+  let lv;
+  if(d != null && d <= 15 && exNow) lv = 'red';
+  else if((d != null && d <= 15 && (prevEx || (pr != null && pr >= .25))) || (d != null && d <= 30 && exNow) || (down && d != null && d <= 5)) lv = 'orange';
+  else if((d != null && d <= 30) || ddc) lv = 'yellow';
+  else lv = 'green';
+  const times = last && last.censor === 'none' ? last.value / STD : null;
+  const distTxt = d == null ? 'ไม่อยู่ใกล้แม่น้ำที่ตรวจพบสารหนู (ห่างเกิน 60 กม.)' : d <= 2 ? `อยู่ติด${rn}` : `ห่างจาก${rn} ประมาณ ${d} กม.`;
+  const head = {
+    red: ['เกินมาตรฐาน', `ผลตรวจล่าสุดที่จุดใกล้คุณพบสารหนูสูงกว่ามาตรฐาน${times ? ' ' + times.toFixed(1) + ' เท่า' : ''} ไม่ควรดื่มหรือใช้น้ำจาก${rn}ประกอบอาหาร`],
+    orange: ['เฝ้าระวัง', down ? `จังหวัดนี้อยู่ปลายน้ำและยังไม่มีจุดตรวจของรัฐ จุดตรวจต้นน้ำที่ใกล้ที่สุดค่าล่าสุด${exNow ? 'เกิน' : 'ไม่เกิน'}มาตรฐาน แต่ต้นน้ำขึ้นไปพบเกินในบางจุด จึงควรเฝ้าระวังเมื่อใช้น้ำจาก${rn}` : exNow ? `จุดตรวจใกล้คุณพบสารหนูเกินมาตรฐาน แต่บ้านคุณอยู่ห่างแม่น้ำพอสมควร ควรระวังเมื่อใช้น้ำจาก${rn}` : `ค่าล่าสุดยังไม่เกินมาตรฐาน แต่${prevEx ? 'เคยเกินในการตรวจครั้งก่อน ๆ' : 'มีโอกาสเกินในรอบหน้า'} ควรติดตามผลตรวจต่อ`],
+    yellow: ['ติดตามข่าว', d != null ? `พื้นที่ของคุณอยู่ในลุ่มน้ำเดียวกับจุดที่ตรวจพบสารหนู แต่ไม่ได้อยู่ริมแม่น้ำ ความเสี่ยงต่ำถ้าไม่ได้ใช้น้ำแม่น้ำโดยตรง` : `จังหวัดนี้อยู่ในรายชื่อเฝ้าระวังสุขภาพของกรมควบคุมโรค แต่พื้นที่ที่เลือกไม่ได้อยู่ใกล้แม่น้ำที่มีจุดตรวจ`],
+    green: ['ไม่อยู่ในเส้นทางน้ำที่ตรวจพบ', `แหล่งน้ำในพื้นที่นี้ไม่ได้รับน้ำจากแม่น้ำกก สาย รวก โขง หรือสาละวินช่วงที่ตรวจพบสารหนู เรื่องนี้จึงไม่กระทบพื้นที่ของคุณโดยตรง`]}[lv];
+  const prWord = x => x >= .9 ? 'เกือบแน่นอนว่าจะเกินมาตรฐาน' : x >= .7 ? 'มีแนวโน้มสูงที่จะเกินมาตรฐาน' : x >= .5 ? 'มีโอกาสเกินมากกว่าไม่เกิน' : x >= .25 ? 'มีโอกาสเกินบ้าง' : 'โอกาสเกินมาตรฐานต่ำ';
+  const advice = {
+    red: ['ไม่ดื่ม ไม่หุงหาอาหาร และไม่ชงนมด้วยน้ำจากแม่น้ำ การต้มไม่ทำให้สารหนูหายไป', 'ใช้น้ำประปาหรือน้ำบรรจุขวด ถ้าต้องกรองเองควรใช้เครื่องกรองระบบ RO', 'กินเนื้อปลาได้ แต่เลี่ยงพุง เครื่องใน และไส้ปลา', 'งดใช้น้ำแม่น้ำรดผักกินใบช่วงนี้ เด็ก หญิงตั้งครรภ์ และผู้สูงอายุควรเลี่ยงการลงน้ำ', 'ถ้ามีผื่น ผิวหนังหนาเป็นปื้น หรือชาปลายมือปลายเท้า ให้ไปโรงพยาบาลใกล้บ้าน'],
+    orange: ['เลี่ยงการดื่มหรือประกอบอาหารด้วยน้ำจากแม่น้ำโดยตรง', 'ถ้าใช้น้ำประปาอยู่แล้ว ใช้ได้ตามปกติ', 'ติดตามผลตรวจรอบถัดไปในหน้านี้หรือประกาศของจังหวัด', 'ล้างผักผลไม้ให้สะอาด และเลือกซื้อจากแหล่งที่เชื่อถือได้'],
+    yellow: ['ใช้น้ำประปาหรือน้ำดื่มตามปกติ', 'ถ้าใช้น้ำบ่อตื้นหรือบ่อบาดาล ควรตรวจคุณภาพน้ำตามรอบปกติ', 'ติดตามข่าวจากจังหวัดและกรมควบคุมโรค'],
+    green: ['ใช้น้ำตามปกติ', 'ถ้าเดินทางไปพื้นที่ริมแม่น้ำที่ตรวจพบ ไม่ควรดื่มน้ำจากแม่น้ำโดยตรง']}[lv];
+  const rows = [];
+  rows.push(`<div class="arow"><h3>ที่ตั้ง</h3><div><p>${esc(distTxt)}</p>${s && o ? `<p class="m">จุดตรวจของรัฐที่ใกล้ที่สุด: ${esc(s)} ${esc(o.site || '')}${o.tambon ? ' ต.' + esc(o.tambon) : ''} อ.${esc(o.amphoe)} จ.${esc(o.province)}${down ? ' (เป็นจุดตรวจต้นน้ำ ในจังหวัดนี้ยังไม่มีจุดตรวจ)' : ''}</p>` : ''}${I.note ? `<p class="m">${esc(I.note)}</p>` : ''}${I.cands.length > 1 ? `<p class="m" style="margin-top:8px">จุดตรวจอื่นที่เกี่ยวข้องกับพื้นที่นี้ (ค่าจริงล่าสุด มก./ล.):</p><div class="others">${I.cands.filter(x => x !== s).map(x => { const l = lastObs(x); return `<span style="color:${isEx(l) ? '#B42318' : 'inherit'}">${esc(x)} ${esc(RIVER_NAME[riverOfStation(x)] || '')} ${esc(l.value_reported)}</span>`; }).join('')}</div>` : ''}</div></div>`);
+  if(last){
+    rows.push(`<div class="arow"><h3>ค่าปัจจุบัน<span class="tagob">ค่าจริง</span></h3><div><div class="v" style="color:${isEx(last) ? '#B42318' : 'var(--ink)'}">${esc(last.value_reported)} <span class="m" style="font-weight:400;font-size:16px">มก./ล.</span></div>
+      <p>${isEx(last) ? `สูงกว่ามาตรฐาน (0.01) ${times.toFixed(1)} เท่า` : 'ไม่เกินมาตรฐาน 0.01 มก./ล.'}</p><p class="m">ตรวจเมื่อ ${esc(thDate(last.t_mid))} โดย ${esc(o.network === 'mekong_ne' ? 'สคพ.9 อุดรธานี' : 'สคพ.1 เชียงใหม่')} กรมควบคุมมลพิษ${fresh ? '' : ' (ข้อมูลเก่ากว่า 4 เดือน)'} · เกินมาตรฐาน ${H[s].filter(isEx).length} จาก ${H[s].length} ครั้งที่ตรวจ</p></div></div>`.replace(' · ', ' '));
+  }
+  if(f && f.horizons){
+    const z = f.horizons;
+    rows.push(`<div class="arow"><h3>ที่คาดว่าจะเกิดขึ้น<span class="tagfc">พยากรณ์</span></h3><div><div class="v fc">${fmt(z[0].p50)} <span class="m" style="font-weight:400;font-size:16px">มก./ล.</span></div>
+      <p>รอบหน้า (ประมาณ ${esc(thDate(z[0].target_date))}) ${esc(prWord(z[0].prob_exceed))} (โอกาส ${Math.round(z[0].prob_exceed*100)}%)</p>
+      <p class="m">ช่วงที่น่าจะเป็น ${fmt(z[0].p10)} ถึง ${fmt(z[0].p90)} มก./ล. ถัดไปอีก 2 รอบ: ${z.slice(1).map(x => `${thDate(x.target_date,{month:'short',year:'2-digit'})} ${fmt(x.p50)}${x.reliability !== 'normal' ? ' (ความเชื่อมั่นต่ำ)' : ''}`).join(', ')} ค่าพยากรณ์ไม่ใช่ค่าตรวจวัด</p>
+      <div style="margin-top:10px">${tsChart(s, 360, 84, {small:true})}</div><p class="m">เส้นทึบ = ค่าจริง เส้นประสีน้ำเงิน = ค่าพยากรณ์ เส้นแดง = มาตรฐาน</p></div></div>`);
+  }
+  if(ctx.ddc_surveillance) rows.push(`<div class="arow"><h3>สุขภาพในจังหวัด</h3><div><p>กรมควบคุมโรคตรวจปัสสาวะคนในจังหวัดนี้ ${ctx.ddc_urine_tested} คน พบสารหนูเกินค่าอ้างอิง ${ctx.ddc_above_ref} คน (ปีงบประมาณ 2569)</p><p class="m">ตัวเลขระดับจังหวัด ไม่ได้หมายความว่าทุกคนในพื้นที่มีความเสี่ยง</p></div></div>`);
+  const loc = (ctx.local || []).filter(l => !a || (l.amphoe || '').split(/\s+/).some(x => x && (a.th.includes(x) || x.includes(a.th.replace(/^เมือง/, '')))));
+  if(loc.length) rows.push(`<div class="arow"><h3>รายงานในพื้นที่</h3><div><ul>${loc.map(l => `<li>${l.tambon ? 'ต.' + esc(l.tambon) + ' ' : ''}${l.amphoe ? 'อ.' + esc(l.amphoe) + ': ' : ''}${esc(l.what)} <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.source)}</a></li>`).join('')}</ul></div></div>`);
+  const tm = CTX.treatment_measures.measures.filter(m => m.place.includes(p.th) || (r && r !== 'mekong' && m.river.includes(RIVER_NAME[r])) || (r === 'mekong' && ['Chiang Rai'].includes(p.en) && m.river.startsWith('แม่น้ำโขง')));
+  if(tm.length) rows.push(`<div class="arow"><h3>หน่วยงานทำอะไรแล้ว</h3><div><ul>${tm.slice(0,4).map(m => `<li><b>${esc(CTX.treatment_measures._meta.status_codes[m.status])}:</b> ${esc(m.place)} ${esc(m.result)}</li>`).join('')}</ul></div></div>`);
+  rows.push(`<div class="arow"><h3>ควรทำอย่างไร</h3><div><ul>${advice.map(x => `<li>${esc(x)}</li>`).join('')}</ul><p class="m">สอบถามสายด่วนกรมควบคุมโรค 1422 หรือการประปาส่วนภูมิภาคในพื้นที่ ข้อมูลนี้ใช้เพื่อเฝ้าระวัง ไม่ใช่การวินิจฉัยทางการแพทย์</p>
+    ${s && o && o.lat != null ? `<div class="abtn"><button class="btn" id="aMap">ดูจุดตรวจนี้บนแผนที่ค่าจริง</button><button class="btn" id="aFc" style="background:#1F5FD1;color:#fff;border-color:#1F5FD1">ดูบนแผนที่พยากรณ์</button></div>` : ''}</div></div>`);
+  box.innerHTML = `<div class="aband s-${lv}"><div class="where">${esc(where)}</div><div class="lvl">${esc(head[0])}</div><p>${esc(head[1])}</p></div><div class="abody">${rows.join('')}</div>`;
+  $('#ahint').textContent = !p.near ? 'จังหวัดนี้ไม่มีพื้นที่ใกล้แม่น้ำที่ตรวจพบสารหนู จึงแสดงผลระดับอำเภอ' : '';
+  const jump = (m, id) => { const M = MAPS[m]; if(!M) return; M.sel = s; M.setView(VIEW_OF[r] || 'th'); M.refresh(); M.showCard(); $(id).scrollIntoView({behavior: reduce ? 'auto' : 'smooth'}); };
+  const b1 = $('#aMap'), b2 = $('#aFc'); if(b1) b1.onclick = () => jump('obs', '#actual'); if(b2) b2.onclick = () => jump('fc', '#fcmap');
+}
+
+/* ---------- tables: actual / forecast / compare (kept separate) ---------- */
+const sortIds = ids => ids.sort((a,b) => (ST[a].network+a).localeCompare(ST[b].network+b));
+const area = o => `${o.tambon ? 'ต.' + esc(o.tambon) + ' ' : ''}อ.${esc(o.amphoe)} จ.${esc(o.province)}`;
+function filters(){ for(const [id, fn] of [['#fObs', tableObs], ['#fFc', tableFc]]){ const el = $(id);
+  el.innerHTML = [['all','ทั้งหมด'], ...Object.entries(NET_TH)].map(([k,t]) => `<button data-n="${k}" aria-pressed="${k === 'all'}">${t}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { el.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); fn(b.dataset.n); }); } }
+function tableWin(){ const today = new Date().toISOString().slice(0,10), days = (a,b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
+  $('#winRun').textContent = thDate((F.generated_at || '').slice(0,10)) || thDate(today); $('#winRho').textContent = (F.model && F.model.rho_per_14d ? F.model.rho_per_14d.toFixed(2) : '');
+  $('#tWin tbody').innerHTML = Object.keys(NET_TH).map(n => { const fs = F.segment_forecast.filter(f => f.network === n); if(!fs.length) return '';
+    const last = fs.map(f => f.last_obs_date).sort().at(-1), hz = fs[0].horizons, gap = hz.length > 1 ? days(hz[0].target_date, hz[1].target_date) : days(last, hz[0].target_date);
+    const cell = (z, i) => { const past = z.target_date < today, d = days(last, z.target_date);
+      return `<td data-l="${['รอบหน้า','2 รอบข้างหน้า','3 รอบข้างหน้า'][i]}" class="fcv"><b>${esc(thDate(z.target_date))}</b><small>ห่างจากค่าจริง ${d} วัน ${z.validated ? 'ทดสอบย้อนหลังแล้ว' : 'ยังไม่ได้ทดสอบ'}${z.reliability !== 'normal' ? ' ความน่าเชื่อถือต่ำ*' : ''}${past ? ' เลยวันแล้ว รอรายงาน' : ''}</small></td>`; };
+    const mon = n === 'mekong_ne' ? ' <span class="sub" style="font-size:12px">(รายงานระบุเพียงเดือน)</span>' : '';
+    return `<tr><td data-l="เครือข่าย">${esc(NET_TH[n])}</td><td data-l="ตรวจล่าสุด">${esc(thDate(last))}${mon}</td><td data-l="ระยะห่างปกติ" class="n">${gap} วัน</td>${hz.map(cell).join('')}</tr>`; }).join(''); }
+function tableObs(net){ const ids = sortIds(Object.keys(H).filter(s => ST[s] && (net === 'all' || ST[s].network === net))); let g = '';
+  $('#tObs tbody').innerHTML = ids.map(s => { const o = ST[s], l = lastObs(s), n = H[s].filter(isEx).length, head = o.network !== g ? (g = o.network, `<tr class="grp"><td colspan="7">${esc(NET_TH[g])}</td></tr>`) : '';
+    return head + `<tr><td data-l="จุดตรวจ"><span class="dot" style="background:${rgb(cOf(l))}"></span>${esc(s)}</td><td data-l="แม่น้ำ">${esc(o.river)}</td><td data-l="พื้นที่">${area(o)}</td>
+      <td data-l="ค่าจริงล่าสุด" class="n" style="color:${isEx(l) ? '#b91c1c' : 'inherit'};font-weight:500">${esc(l.value_reported)}</td><td data-l="วันเก็บตัวอย่าง">${esc(thDate(l.t_mid))} <span class="sub" style="font-size:12px">ครั้งที่ ${l.round}</span></td>
+      <td data-l="ประวัติค่าจริง">${sparkObs(s)}</td><td data-l="เกินมาตรฐาน" class="n">${n} / ${H[s].length} ครั้ง</td></tr>`; }).join(''); }
+function tableFc(net){ const list = F.segment_forecast.filter(f => ST[f.station_id] && (net === 'all' || f.network === net)); const ids = sortIds(list.map(f => f.station_id)); let g = '';
+  $('#tFc tbody').innerHTML = ids.map(s => { const f = fcOf(s), o = ST[s], head = f.network !== g ? (g = f.network, `<tr class="grp"><td colspan="5">${esc(NET_TH[g])}</td></tr>`) : '';
+    const cell = (z, i) => `<td data-l="${['รอบหน้า','2 รอบข้างหน้า','3 รอบข้างหน้า'][i]}" class="n fcv"><b style="color:${z.prob_exceed >= .5 ? '#1d4ed8' : 'inherit'}">${fmt(z.p50)}</b> ${Math.round(z.prob_exceed*100)}%${z.reliability !== 'normal' ? '*' : ''}<small>${fmt(z.p10)}–${fmt(z.p90)} ${esc(thDate(z.target_date,{day:'numeric',month:'short',year:'2-digit'}))}</small></td>`;
+    return head + `<tr><td data-l="จุดตรวจ">${esc(s)} <span class="sub" style="font-size:12px">${esc(o.river)}</span></td><td data-l="พื้นที่">${area(o)}</td>${f.horizons.map(cell).join('')}</tr>`; }).join(''); }
+function tableCmp(t){ const ids = sortIds(Object.keys(BT).filter(s => ST[s] && BT[s].some(b => b.t === t)));
+  $('#tCmpCap').textContent = `วันเก็บตัวอย่าง ${thDate(t)}: ค่าจริงเทียบค่าที่พยากรณ์ไว้ (มก./ล.)`;
+  $('#tCmp tbody').innerHTML = ids.map(s => { const b = BT[s].find(x => x.t === t), o = ST[s], all = BT[s], meas = all.filter(x => x.obs_censor === 'none');
+    const inb = meas.filter(x => x.in_band).length, cls = all.filter(x => x.obs_censor === 'none' ? ((x.obs_value > STD) === (x.p50 > STD)) : x.p50 <= STD).length;
+    let res, ok; if(b.obs_censor === 'none'){ ok = b.in_band; res = ok ? 'อยู่ในช่วง' : b.obs_value > b.p90 ? 'จริงสูงกว่าช่วง' : 'จริงต่ำกว่าช่วง'; } else { ok = b.p50 <= STD; res = ok ? 'ไม่เกิน 0.01 ทั้งคู่' : 'พยากรณ์สูงกว่าจริง'; }
+    return `<tr><td data-l="จุดตรวจ">${esc(s)} <span class="sub" style="font-size:12px">${esc(o.river)}</span></td><td data-l="พื้นที่">${area(o)}</td><td data-l="ค่าจริง" class="n" style="font-weight:500">${esc(b.obs_reported)}</td>
+      <td data-l="พยากรณ์ไว้ P50" class="n fcv">${fmt(b.p50)}</td><td data-l="ช่วง P10–P90" class="n fcv">${fmt(b.p10)}–${fmt(b.p90)}</td><td data-l="ผล"><span class="badge ${ok ? 'b-ok' : 'b-watch'}">${res}</span></td>
+      <td data-l="ความแม่นยำทุกครั้ง" class="sub" style="font-size:13px">ทายเกิน/ไม่เกินถูก ${cls}/${all.length} อยู่ในช่วง ${inb}/${meas.length}</td></tr>`; }).join(''); }
+
+/* ---------- metric cards ---------- */
+function cards(){
+  const dates = OBS_DATES, series = dates.map(t => OBS.filter(o => isEx(obsAt(o.station_id, t))).length);
+  const provRed = t => G.provinces.filter(p => p.st.some(s => isEx(obsAt(s, t))));
+  const redNow = provRed(LAST_T), provSeries = dates.map(t => provRed(t).length);
+  const ddc = CTX.affected_areas.provinces.filter(p => p.ddc_surveillance), ddcSum = ddc.reduce((a,p) => a + p.ddc_above_ref, 0), ddcN = ddc.reduce((a,p) => a + p.ddc_urine_tested, 0);
+  const active = OBS.filter(o => obsAt(o.station_id, LAST_T)).length;
+  const defs = [
+    {up:`ค่าจริงล่าสุดถึง ${thDate(LAST_T)}`, data:provSeries, title:'จังหวัดที่จุดตรวจของรัฐพบสารหนูเกินมาตรฐาน', value:redNow.length, unit:'จังหวัด', cap:redNow.map(p => p.name_th).join(', ') || 'ไม่มี'},
+    {up:'ค่าจริง ทุกเครือข่าย', data:series, title:'จุดตรวจที่เกิน 0.01 มก./ล.', value:series[series.length-1], unit:`/ ${active} จุด`, cap:`สูงสุด ${Math.max(...series)} จุด เมื่อ ${thDate(dates[series.indexOf(Math.max(...series))])}`},
+    {up:'กรมควบคุมโรค ปีงบประมาณ 2569', data:ddc.map(p => p.ddc_above_ref), title:'คนที่สารหนูในปัสสาวะเกินค่าอ้างอิง', value:ddcSum, unit:`/ ${ddcN.toLocaleString('th-TH')} คน`, cap:`${ddc.length} จังหวัด มากสุด ` + ddc.slice().sort((a,b) => b.ddc_above_ref - a.ddc_above_ref).slice(0,3).map(p => p.name_th + ' ' + p.ddc_above_ref).join(', ')}];
+  $('#cards').innerHTML = defs.map((d,i) => `<div class="peak" id="pk${i}"><canvas></canvas><div class="p-up">${esc(d.up)}</div><div class="p-t">${esc(d.title)}</div><div class="p-v"><span>0</span><small>${esc(d.unit)}</small></div><div class="p-c">${esc(d.cap)}</div></div>`).join('');
+  defs.forEach((d,i) => peakCard($('#pk'+i), d, ['#0f172a','#dc2626','#0d9488'][i])); }
+function peakCard(el, d, accent){
+  const cv = el.querySelector('canvas'), num = el.querySelector('.p-v span'); let t0 = null, shown = false;
+  const draw = now => { const r = el.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio||1); cv.width = r.width*dpr; cv.height = r.height*dpr;
+    const c = cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); const w = r.width, h = r.height;
+    const t = reduce ? 1 : Math.min(1, (now - t0)/1800), e = t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+    const g = c.createRadialGradient(w*.5, h*1.05, 10, w*.5, h*.7, w*.95); g.addColorStop(0, accent + '33'); g.addColorStop(.45, accent + '12'); g.addColorStop(1, '#ffffff');
+    c.fillStyle = '#fbfcff'; c.fillRect(0,0,w,h); c.fillStyle = g; c.fillRect(0,0,w,h);
+    c.strokeStyle = 'rgba(15,23,42,.05)'; c.lineWidth = 1; c.beginPath(); for(let x=w/2%34; x<w; x+=34){ c.moveTo(x,h*.36); c.lineTo(x,h); } for(let y=h*.36; y<h; y+=34){ c.moveTo(0,y); c.lineTo(w,y); } c.stroke();
+    const vals = d.data.length > 1 ? d.data : [0, ...d.data], lo = Math.min(...vals), hi = Math.max(...vals), top = h*.14, bot = h*.5;
+    const X = i => w*.06 + i/(vals.length-1)*w*.88, Y = v => bot - (v-lo)/((hi-lo)||1)*(bot-top);
+    const n = Math.max(2, Math.ceil(vals.length*e)); let pk = 0; vals.forEach((v,i) => { if(v > vals[pk]) pk = i; });
+    c.save(); c.shadowColor = accent + '88'; c.shadowBlur = 12; c.strokeStyle = accent; c.lineWidth = 2.4; c.lineJoin = 'round'; c.beginPath();
+    for(let i=0;i<n;i++){ const x = X(i), y = Y(vals[i]); i ? c.lineTo(x,y) : c.moveTo(x,y); } c.stroke(); c.restore();
+    if(n > pk){ const x = X(pk), y = Y(vals[pk]); const hg = c.createRadialGradient(x,y,0,x,y,18); hg.addColorStop(0, accent + '55'); hg.addColorStop(1, accent + '00'); c.fillStyle = hg; c.beginPath(); c.arc(x,y,18,0,7); c.fill();
+      c.fillStyle = '#fff'; c.beginPath(); c.arc(x,y,6,0,7); c.fill(); c.strokeStyle = accent; c.lineWidth = 2.5; c.stroke(); }
+    num.textContent = Math.round(d.value * e).toLocaleString('th-TH'); if(t < 1) requestAnimationFrame(draw); };
+  new IntersectionObserver(([en]) => { if(en.isIntersecting && !shown){ shown = true; t0 = performance.now(); requestAnimationFrame(draw); } }).observe(el);
+  new ResizeObserver(() => { if(shown) requestAnimationFrame(draw); }).observe(el); }
+
+/* ---------- provinces: actual status and forecast status side by side ---------- */
+const PROV_ORDER = ['Chiang Mai','Chiang Rai','Mae Hong Son','Loei','Nong Khai','Bueng Kan','Nakhon Phanom','Mukdahan','Amnat Charoen','Ubon Ratchathani'];
+function provinces(){
+  $('#provList').innerHTML = PROV_ORDER.map(n => { const p = G.provinces.find(q => q.name === n), c = p.ctx || {}, sts = sortIds(p.st.filter(s => H[s]));
+    const exNow = sts.filter(s => isEx(obsAt(s, LAST_T))), anyNow = sts.some(s => obsAt(s, LAST_T));
+    const pmax = Math.max(0, ...sts.map(s => { const f = fcOf(s); return f && f.reliability === 'normal' ? f.prob_exceed : 0; }));
+    let cls = exNow.length ? 'red' : anyNow ? 'ok' : 'none', b1 = exNow.length ? ['b-red', `ค่าจริง: เกินมาตรฐาน ${exNow.length} จุด`] : anyNow ? ['b-ok','ค่าจริง: ไม่เกินมาตรฐาน'] : ['b-none','ไม่มีค่าจริงช่วงนี้'];
+    if(c.downstream_no_data){ cls = 'nodata'; b1 = ['b-none','ปลายน้ำ ยังไม่มีผลตรวจ']; }
+    const b2 = sts.length ? `<span class="badge b-fc">พยากรณ์รอบหน้า: โอกาสเกินสูงสุด ${Math.round(pmax*100)}%</span>` : '';
+    const rows = sts.map(s => { const o = ST[s], l = lastObs(s), f = fcOf(s);
+      return `<li><span>${esc(s)} ${esc(o.river)}<br><span class="s">${esc(o.site)}${o.tambon ? ' ต.' + esc(o.tambon) : ''} อ.${esc(o.amphoe)}</span></span><b><span style="color:${isEx(l) ? '#b91c1c' : 'inherit'}">${esc(l.value_reported)}</span> <span class="s" style="font-weight:400;font-size:11px">${esc(thDate(l.t_mid,{month:'short',year:'2-digit'}))}</span>${f ? `<br><span style="color:var(--fc);font-weight:400">◆ ${fmt(f.p50)} ${Math.round(f.prob_exceed*100)}%</span>` : ''}</b></li>`; }).join('');
+    const loc = (c.local || []).map(l => `<p>${l.tambon ? 'ต.' + esc(l.tambon) + ' ' : ''}${l.amphoe ? 'อ.' + esc(l.amphoe) : ''}: ${esc(l.what)} <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.source)}</a></p>`).join('');
+    return `<div class="prov ${cls}"><h3><span>จ.${esc(p.name_th)}</span></h3><div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0"><span class="badge ${b1[0]}">${b1[1]}</span>${b2}</div>
+      <div class="sub" style="font-size:13px">ภาค${esc(c.region || '')} แม่น้ำ${esc((c.rivers || []).join(' '))} ค่าจริงถึง ${esc(thDate(LAST_T))}</div>
+      ${c.ddc_surveillance ? `<div class="ddc"><div><b>${c.ddc_urine_tested}</b>คนที่ตรวจปัสสาวะ</div><div><b style="color:#b91c1c">${c.ddc_above_ref}</b>เกินค่าอ้างอิง</div><div style="align-self:end">กรมควบคุมโรค 2569</div></div>` : ''}
+      ${rows ? `<ul>${rows}</ul><div class="sub" style="font-size:12px;margin-top:6px">ตัวเลขสีดำ = ค่าจริงล่าสุด ◆ สีน้ำเงิน = พยากรณ์รอบหน้า P50 และโอกาสเกิน</div>` : `<div class="loc">ยังไม่พบผลตรวจสารหนูในน้ำผิวดินจากหน่วยงานรัฐในชุดข้อมูลนี้ จังหวัดนี้อยู่ปลายน้ำของจุดที่พบเกินมาตรฐาน จึงควรติดตามผลตรวจของ คพ. และ สคพ. ในพื้นที่</div>`}
+      ${loc ? `<div class="loc">${loc}</div>` : ''}</div>`; }).join(''); }
+
+/* ---------- per-station forecast-vs-actual chart ---------- */
+function compare(){
+  const ids = sortIds(Object.keys(BT).filter(s => ST[s])), groups = {}; ids.forEach(s => (groups[ST[s].network] = groups[ST[s].network] || []).push(s));
+  $('#cmpSel').innerHTML = Object.entries(groups).map(([n, l]) => `<optgroup label="${esc(NET_TH[n])}">${l.map(s => `<option value="${esc(s)}">${esc(s)} ${esc(ST[s].river)} ${ST[s].tambon ? 'ต.' + esc(ST[s].tambon) : ''} อ.${esc(ST[s].amphoe)}</option>`).join('')}</optgroup>`).join('');
+  $('#cmpSel').value = ids.includes('SA01') ? 'SA01' : ids[0]; $('#cmpSel').onchange = renderCompare; renderCompare(); scatter(); metrics();
+  new ResizeObserver(() => { renderCompare(); scatter(); }).observe($('#cmpChart')); }
+function renderCompare(){
+  const s = $('#cmpSel').value, o = ST[s], box = $('#cmpChart'), w = Math.max(320, box.clientWidth || 700), h = w < 500 ? 300 : 360;
+  $('#cmpTag').textContent = `${o.river} จ.${o.province}`; box.innerHTML = tsChart(s, w, h);
+  const bt = BT[s] || [], more = $('#cmpMore'), all = more.dataset.all === '1', rows = bt.slice().reverse(), shown = all ? rows : rows.slice(0, 8);
+  more.style.display = rows.length > 8 ? '' : 'none'; more.textContent = all ? 'แสดงเฉพาะ 8 ครั้งล่าสุด' : `แสดงทุกครั้ง (${rows.length})`; more.onclick = () => { more.dataset.all = all ? '0' : '1'; renderCompare(); };
+  $('#cmpTable tbody').innerHTML = shown.map(b => { let res, ok;
+    if(b.obs_censor === 'none'){ ok = b.in_band; res = ok ? 'อยู่ในช่วงพยากรณ์' : b.obs_value > b.p90 ? 'ค่าจริงสูงกว่าช่วง' : 'ค่าจริงต่ำกว่าช่วง'; } else { ok = b.p50 <= STD; res = ok ? 'สอดคล้อง: ไม่เกิน 0.01 ทั้งคู่' : 'พยากรณ์สูงกว่าค่าจริง'; }
+    return `<tr><td data-l="วันเก็บตัวอย่าง">${esc(thDate(b.t))}</td><td data-l="ค่าจริง" class="n">${esc(b.obs_reported)}</td><td data-l="พยากรณ์ P50" class="n fc">${fmt(b.p50)}</td><td data-l="ช่วง P10–P90" class="n fc">${fmt(b.p10)}–${fmt(b.p90)}</td><td data-l="ผลการเทียบ"><span class="badge ${ok ? 'b-ok' : 'b-watch'}">${res}</span></td></tr>`; }).join(''); }
+function scatter(){
+  const box = $('#scatter'), w = Math.max(240, box.clientWidth || 280), h = w, pad = 34;
+  const pts = Object.entries(BT).flatMap(([s, l]) => l.filter(b => b.obs_value != null).map(b => ({...b, s})));
+  const lo = 0.004, hi = 0.2, L = v => Math.log10(Math.min(hi, Math.max(lo, v)));
+  const X = v => pad + (L(v) - L(lo)) / (L(hi) - L(lo)) * (w - pad - 8), Y = v => h - pad - (L(v) - L(lo)) / (L(hi) - L(lo)) * (h - pad - 8);
+  let s = `<rect x="${pad}" y="8" width="${w-pad-8}" height="${h-pad-8}" fill="#fbfcfe" stroke="rgba(15,23,42,.08)"/>`;
+  for(const v of [0.005,0.01,0.02,0.05,0.1]) s += `<text x="${X(v)}" y="${h-pad+14}" font-size="10" text-anchor="middle" fill="#5b6577">${v}</text><text x="${pad-4}" y="${Y(v)+3}" font-size="10" text-anchor="end" fill="#5b6577">${v}</text>`;
+  s += `<line x1="${X(lo)}" y1="${Y(lo)}" x2="${X(hi)}" y2="${Y(hi)}" stroke="#0f172a" stroke-opacity=".35"/><line x1="${X(.01)}" x2="${X(.01)}" y1="8" y2="${h-pad}" stroke="#dc2626" stroke-dasharray="2 3" stroke-opacity=".7"/><line x1="${pad}" x2="${w-8}" y1="${Y(.01)}" y2="${Y(.01)}" stroke="#dc2626" stroke-dasharray="2 3" stroke-opacity=".7"/>`;
+  for(const p of pts) s += `<circle cx="${X(p.p50).toFixed(1)}" cy="${Y(p.obs_value).toFixed(1)}" r="3" fill="${NET_COL[p.network]}" fill-opacity=".55"><title>${esc(p.s)} ${esc(thDate(p.t))}: พยากรณ์ ${fmt(p.p50)} จริง ${esc(p.obs_reported)}</title></circle>`;
+  s += `<text x="${(w+pad)/2}" y="${h-4}" font-size="11" text-anchor="middle" fill="#1d4ed8">ค่าพยากรณ์ P50 (มก./ล.)</text><text x="10" y="${h/2}" font-size="11" text-anchor="middle" fill="#0f172a" transform="rotate(-90 10 ${h/2})">ค่าจริง (มก./ล.)</text>`;
+  const inb = pts.filter(p => p.in_band).length;
+  box.innerHTML = `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="แผนภาพกระจายค่าพยากรณ์เทียบค่าจริง">${s}</svg><div class="lg" style="margin-top:6px">${Object.entries(NET_TH).map(([k,t]) => `<span><i class="dot" style="background:${NET_COL[k]};margin:0"></i>${esc(t)}</span>`).join('')}</div><div class="sub" style="font-size:13px">${pts.length} คู่ค่าที่ตรวจวัดได้ ค่าจริงอยู่ในช่วง P10–P90 ${Math.round(inb/pts.length*100)}%</div>`; }
+function metrics(){ const B = M.validation.by_network || {};
+  $('#metrics').innerHTML = Object.entries(B).map(([k, b]) => `<div class="mbox"><div class="sub" style="font-size:13px">${esc(NET_TH[k])}</div><div class="big">${b.rmse_ln_model != null ? b.rmse_ln_model.toFixed(2) : '–'} <span class="sub" style="font-size:13px">RMSE ของ ln C</span></div>
+    <p>ทายว่าเท่าครั้งก่อนได้ ${b.rmse_ln_persistence != null ? b.rmse_ln_persistence.toFixed(2) : '–'} (${b.n_point_tests} ค่า) ทายถูกว่าเกิน/ไม่เกินมาตรฐาน ${b.hit_rate_p50 != null ? Math.round(b.hit_rate_p50*100) + '%' : '–'} จาก ${b.n_exceed_tests} ครั้ง</p>
+    ${k === 'mekong_ne' ? '<p>ข้อจำกัด: ครั้งที่ 4 (ส.ค. 2569) น้ำหลาก ความขุ่น 130–1,300 NTU ค่าจริงพุ่งถึง 0.044 แต่แบบจำลองซึ่งเห็นเพียง 3 ครั้งก่อนที่ไม่เกิน 0.01 ทายต่ำกว่ามาก ต้องเพิ่มความขุ่นหรือปริมาณน้ำเป็นตัวแปรนำ</p>' : ''}</div>`).join(''); }
+
+/* ---------- flow routes, treatment, method ---------- */
+function routes(){
+  $('#routes').innerHTML = CTX.river_flow.chains.map(ch => `<div class="route"${ch.id === 'mekong' ? ' style="grid-row:span 2"' : ''}><h3>${esc(ch.title)}</h3><ol>${ch.steps.map(st => {
+    const chips = (st.stations || []).filter(s => H[s]).map(s => { const l = lastObs(s); return `<span class="chip" style="border-color:${rgb(cOf(l),.5)};color:${rgb(cOf(l))}" title="${esc(thDate(l.t_mid))}">${esc(s)} ${esc(l.value_reported)}</span>`; }).join('');
+    return `<li class="${st.stations ? '' : 'nd'}"><div>${esc(st.place)}</div>${chips ? `<div class="chips">${chips}</div>` : ''}${st.data ? `<div class="nd-t">${esc(st.data)}</div>` : ''}${st.note ? `<div class="nt">${esc(st.note)}</div>` : ''}</li>`; }).join('')}</ol></div>`).join('') +
+    `<p class="note" style="grid-column:1/-1">ตัวเลขในป้ายคือค่าจริงล่าสุดของแต่ละจุด (มก./ล.) วางเมาส์เพื่อดูวันที่ ${esc(CTX.river_flow._meta.note)}</p>`; }
+function treatment(){ const T = CTX.treatment_measures, sc = T._meta.status_codes, order = {done:0, running:1, planned:2, cancelled:3};
+  $('#tgrid').innerHTML = T.measures.slice().sort((a,b) => order[a.status] - order[b.status]).map(m => `<div class="trow">
+    <div><span class="badge st-${esc(m.status)}">${esc(sc[m.status])}</span><span class="k">${esc(m.type)}</span><span class="k">${esc(m.river)}</span></div>
+    <div><h3>${esc(m.place)}</h3><span class="k">${esc(m.agency)}</span></div>
+    <div><span class="k">ทำอย่างไร</span><p>${esc(m.how)}</p></div>
+    <div class="res"><span class="k">ผลที่รายงาน ${esc(thDate(m.date))}</span><p>${esc(m.result)}</p><a href="${esc(m.url)}" target="_blank" rel="noopener">อ่านแหล่งที่มา: ${esc(m.source)}</a></div></div>`).join(''); }
+function method(){ const V = M.validation, A = M.model_A;
+  $('#beta').textContent = `${A.beta.toFixed(2)} (CI95 ${A.ci95[0].toFixed(2)}–${A.ci95[1].toFixed(2)}, ${A.n_obs} ค่า)`;
+  const box = [['ความคลาดเคลื่อน (RMSE ของ ln C)', V.rmse_ln_model.toFixed(2), `ทดสอบย้อนหลัง ${V.n_point_tests} ค่า ดีกว่าการทายว่าเท่ากับครั้งล่าสุด (${V.rmse_ln_persistence.toFixed(2)})`],
+    ['คะแนน Brier ของโอกาสเกินมาตรฐาน', V.brier_model.toFixed(3), `ดีกว่าการใช้อัตราเฉลี่ย (${V.brier_climatology.toFixed(3)}) ยิ่งต่ำยิ่งดี`],
+    ['ช่วงพยากรณ์ 80% ครอบค่าจริง', Math.round(V.coverage80_raw*100) + '%', `จึงขยายช่วงด้วยตัวคูณ k = ${M.interval_k.toFixed(2)} ให้ครอบใกล้ 80%`]];
+  $('#vbox').innerHTML = box.map(([t,v,p]) => `<div class="box"><div class="sub">${esc(t)}</div><div class="big">${esc(v)}</div><p>${esc(p)}</p></div>`).join(''); }
+
+/* ---------- live update: re-check meta.json every 10 min ---------- */
+function poll(){ setInterval(() => { if(document.hidden) return;
+  fetch('data/meta.json', {cache:'no-store'}).then(r => r.ok ? r.json() : null).then(m => { if(m && m.run_id && m.run_id !== M.run_id){
+    $('#toastMsg').textContent = `มีผลคำนวณใหม่ (${thDate(m.generated_at.slice(0,10))}) จากรายงานรอบใหม่`; $('#toast').classList.add('on'); $('#toastBtn').onclick = () => location.reload(); } }).catch(() => {}); }, 600000); }
+
+/* ---------- halftone shader banner (21st.dev Shader Builder recipe, plain WebGL1) ---------- */
+function shader(){
+  const cv = $('#shader'); const gl = cv.getContext('webgl', {antialias:false, premultipliedAlpha:false}); if(!gl) return;
+  const VS = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.0,1.0);}', FS = document.getElementById('halftone-fs').textContent;
+  const sh = (t, src) => { const s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s); if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){ console.warn(gl.getShaderInfoLog(s)); return null; } return s; };
+  const v = sh(gl.VERTEX_SHADER, VS), f = sh(gl.FRAGMENT_SHADER, FS); if(!v || !f) return;
+  const pr = gl.createProgram(); gl.attachShader(pr, v); gl.attachShader(pr, f); gl.linkProgram(pr); if(!gl.getProgramParameter(pr, gl.LINK_STATUS)) return; gl.useProgram(pr);
+  const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
+  const al = gl.getAttribLocation(pr, 'a'); gl.enableVertexAttribArray(al); gl.vertexAttribPointer(al, 2, gl.FLOAT, false, 0, 0);
+  const U = n => gl.getUniformLocation(pr, n), cols = new Float32Array(24); [[0.043,0.063,0.149],[0.239,0.275,0.910],[0.694,0.549,1.000],[1.000,0.839,0.906]].forEach((c,i) => cols.set(c, i*3));
+  gl.uniform3fv(U('u_colors'), cols); gl.uniform4f(U('u_shape'), 1.48, 0.88, 0.50, 0.00); gl.uniform4f(U('u_surface'), 2.40, 0.91, 0.00, 1.00);
+  gl.uniform4f(U('u_finish'), 0.00, 0.00, 0.000, 0.06); gl.uniform4f(U('u_transform'), 2926.0, 0.00, 0.00, 0.0); gl.uniform4f(U('u_space'), 0.00, 0.00, 0.0, 0.0); gl.uniform4f(U('u_cursor'), 0.0, 2.0, 0.65, 0.46);
+  const uScene = U('u_scene'); let on = true, id = 0; const t0 = performance.now();
+  const resize = () => { const d = Math.min(devicePixelRatio || 1, 2), r = cv.getBoundingClientRect(); cv.width = Math.max(1, Math.round(r.width*d)); cv.height = Math.max(1, Math.round(r.height*d)); gl.viewport(0, 0, cv.width, cv.height); };
+  const frame = now => { id = 0; gl.uniform4f(uScene, cv.width, cv.height, ((now - t0)/1000) * 1.43, 4.0); gl.drawArrays(gl.TRIANGLES, 0, 3); if(on && !reduce && !document.hidden) id = requestAnimationFrame(frame); };
+  const kick = () => { if(!id) id = requestAnimationFrame(frame); };
+  new ResizeObserver(() => { resize(); kick(); }).observe(cv); resize();
+  new IntersectionObserver(([e]) => { on = e.isIntersecting; if(on) kick(); }).observe(cv);
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) kick(); }); kick(); }
+
+/* ---------- liquid glass nav ---------- */
+function nav(){
+  const pill = $('#pill'), drop = $('#drop'), links = [...pill.querySelectorAll('a')];
+  let x = 0, wv = 0, vx = 0, vw = 0, tx = 0, tw = 0, act = -1, run = 0;
+  const target = i => { const a = links[i]; tx = a.offsetLeft; tw = a.offsetWidth; links.forEach((l,k) => k === i ? l.setAttribute('aria-current','true') : l.removeAttribute('aria-current'));
+    if(reduce || !wv){ x = tx; wv = tw; drop.style.transform = `translateX(${x}px)`; drop.style.width = wv+'px'; return; } if(!run) run = requestAnimationFrame(tick); };
+  const tick = () => { vx += (tx - x)*.12 - vx*.32; vw += (tw - wv)*.12 - vw*.32; x += vx; wv += vw;
+    drop.style.transform = `translateX(${x}px) scaleY(${1 - Math.min(.18, Math.abs(vx)/120)})`; drop.style.width = wv+'px';
+    run = (Math.abs(tx-x) > .3 || Math.abs(vx) > .1) ? requestAnimationFrame(tick) : 0; };
+  const secs = links.map(a => document.querySelector(a.getAttribute('href')));
+  const spy = () => { let best = 0; secs.forEach((s,i) => { if(s && s.getBoundingClientRect().top < innerHeight*.45) best = i; }); if(best !== act){ act = best; target(best); } };
+  addEventListener('scroll', spy, {passive:true}); act = 0; target(0); new ResizeObserver(() => target(Math.max(0,act))).observe(pill); }
+}
+</script>
+</body>
+</html>

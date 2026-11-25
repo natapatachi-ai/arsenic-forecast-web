@@ -1,0 +1,5 @@
+numpy>=1.26
+pandas>=2.1
+scipy>=1.11
+requests>=2.31   # เฉพาะ 04_fetch_hydrology.py
+lxml>=5.0        # เฉพาะ 04_fetch_hydrology.py (pandas.read_html)
