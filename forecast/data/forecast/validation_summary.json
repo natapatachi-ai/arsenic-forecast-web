@@ -1,36 +1,36 @@
 {
   "n_point_tests": 236,
-  "rmse_ln_model": 0.5632206744129981,
-  "rmse_ln_persistence": 0.6812097815982394,
+  "rmse_ln_model": 0.5633056286624275,
+  "rmse_ln_persistence": 0.681280279514363,
   "coverage80_raw": 0.7415254237288136,
-  "interval_calibration_k": 1.1355800728055625,
+  "interval_calibration_k": 1.135582482680534,
   "coverage80_after_k_in_sample": 0.8008474576271186,
   "n_exceed_tests": 512,
-  "brier_model": 0.17427769685479821,
+  "brier_model": 0.17427788838829283,
   "brier_climatology": 0.24847412109375,
   "by_network": {
     "kok_basin": {
       "n_point_tests": 187,
-      "rmse_ln_model": 0.5114404288409863,
-      "rmse_ln_persistence": 0.6705064565510807,
+      "rmse_ln_model": 0.5114402986635085,
+      "rmse_ln_persistence": 0.6705070110504318,
       "n_exceed_tests": 433,
-      "brier_model": 0.19154715151364451,
+      "brier_model": 0.19154732225236315,
       "hit_rate_p50": 0.7043879907621247
     },
     "mekong_ne": {
       "n_point_tests": 3,
-      "rmse_ln_model": 2.2828399655240914,
-      "rmse_ln_persistence": 2.2833450775381148,
+      "rmse_ln_model": 2.2835916324812997,
+      "rmse_ln_persistence": 2.2840938659561574,
       "n_exceed_tests": 12,
-      "brier_model": 0.2498410507640428,
+      "brier_model": 0.24984207268180023,
       "hit_rate_p50": 0.75
     },
     "salween": {
       "n_point_tests": 46,
-      "rmse_ln_model": 0.4735487283233857,
-      "rmse_ln_persistence": 0.46163195455752487,
+      "rmse_ln_model": 0.47383128211228764,
+      "rmse_ln_persistence": 0.4619207554720168,
       "n_exceed_tests": 67,
-      "brier_model": 0.04913688918030026,
+      "brier_model": 0.04913706637837442,
       "hit_rate_p50": 0.9402985074626866
     }
   }
